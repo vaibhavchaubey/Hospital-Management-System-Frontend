@@ -9,7 +9,7 @@ import {
 const Header = () => {
   return (
     <div className="w-full h-16 flex justify-between px-5 items-center">
-      <ActionIcon variant="transparent" size="xl" aria-label="Settings">
+      <ActionIcon variant="transparent" size="lg" aria-label="Settings">
         <IconLayoutSidebarLeftCollapseFilled
           style={{ width: '70%', height: '90%' }}
           stroke={1.5}
