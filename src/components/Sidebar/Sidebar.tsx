@@ -7,6 +7,7 @@ import {
   IconStethoscope,
   IconVaccine,
 } from '@tabler/icons-react';
+import { NavLink } from 'react-router-dom';
 
 const links = [
   {
@@ -51,6 +52,22 @@ const Sidebar = () => {
         <Text c="dimmed" size="xs">
           Admin
         </Text>
+      </div>
+      <div className="flex flex-col gap-1">
+        {links.map((link) => (
+          <NavLink
+            to={link.url}
+            key={link.url}
+            className={({ isActive }) =>
+              `flex items-center gap-3 w-full font-medium text-neutral-900 px-4 py-5 rounded-lg ${
+                isActive ? 'bg-primary-400' : 'hover:bg-gray-100'
+              }`
+            }
+          >
+            {link.icon}
+            <span>{link.name}</span>
+          </NavLink>
+        ))}
       </div>
     </div>
   );
