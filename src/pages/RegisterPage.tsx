@@ -7,26 +7,46 @@ import {
 import { IconHeartbeat } from '@tabler/icons-react';
 import { useForm } from '@mantine/form';
 import { Link } from 'react-router-dom';
+import type { RegisterUserInput } from '../types';
+import { registerUser } from '../service/UserService';
 
 const RegisterPage = () => {
-  const form = useForm({
+  const form = useForm<RegisterUserInput>({
     initialValues: {
-      type: 'PATIENT',
+      name: '',
+      role: 'PATIENT',
       email: '',
       password: '',
       confirmPassword: '',
     },
 
     validate: {
+      name: (value) => (value ? null : 'Name is required'),
       email: (value) => (/^\S+@\S+$/.test(value) ? null : 'Invalid email'),
-      password: (value) => (!value ? 'Password is required' : null),
+
+      password: (value) => {
+        if (!value) return 'Password is required';
+        const passwordRegex =
+          /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[\W_]).{8,15}$/;
+        return passwordRegex.test(value)
+          ? null
+          : 'Password must be 8–15 characters long and include at least 1 uppercase letter, 1 lowercase letter, 1 digit, and 1 special character';
+      },
+
       confirmPassword: (value, values) =>
         value !== values.password ? "Passwords don't match" : null,
     },
   });
 
-  const handleSubmit = (values: typeof form.values) => {
+  const handleSubmit = (values: RegisterUserInput) => {
     console.log(values);
+    registerUser(values)
+      .then((data) => {
+        console.log('User registered successfully:', data);
+      })
+      .catch((error) => {
+        console.error('Error registering user:', error);
+      });
   };
 
   return (
@@ -49,7 +69,7 @@ const RegisterPage = () => {
             Register
           </div>
           <SegmentedControl
-            {...form.getInputProps('type')}
+            {...form.getInputProps('role')}
             fullWidth
             size="md"
             radius="md"
@@ -57,11 +77,21 @@ const RegisterPage = () => {
             bg="none"
             className="[&_*]:!text-white border border-white"
             data={[
-              { value: 'Patient', label: 'PATIENT' },
-              { value: 'Doctor', label: 'DOCTOR' },
-              { value: 'Admin', label: 'ADMIN' },
+              { value: 'PATIENT', label: 'Patient' },
+              { value: 'DOCTOR', label: 'Doctor' },
+              { value: 'ADMIN', label: 'Admin' },
             ]}
           />
+          <div className="focus-within:[&_.mantine-Input-input]:!border-pink-400">
+            <TextInput
+              className="transition duration-300"
+              variant="unstyled"
+              size="md"
+              radius="md"
+              placeholder="Name"
+              {...form.getInputProps('name')}
+            />
+          </div>
           <div className="focus-within:[&_.mantine-Input-input]:!border-pink-400">
             <TextInput
               className="transition duration-300"
