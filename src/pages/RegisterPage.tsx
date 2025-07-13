@@ -6,11 +6,19 @@ import {
 } from '@mantine/core';
 import { IconHeartbeat } from '@tabler/icons-react';
 import { useForm } from '@mantine/form';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import type { RegisterUserInput } from '../types';
 import { registerUser } from '../service/UserService';
+import {
+  errorNotification,
+  successNotification,
+} from '../Utility/NotificationUtil';
+import { useState } from 'react';
 
 const RegisterPage = () => {
+  const navigate = useNavigate();
+  const [loading, setLoading] = useState(false);
+
   const form = useForm<RegisterUserInput>({
     initialValues: {
       name: '',
@@ -38,15 +46,19 @@ const RegisterPage = () => {
     },
   });
 
-  const handleSubmit = (values: RegisterUserInput) => {
-    console.log(values);
-    registerUser(values)
-      .then((data) => {
-        console.log('User registered successfully:', data);
-      })
-      .catch((error) => {
-        console.error('Error registering user:', error);
-      });
+  const handleSubmit = async (values: RegisterUserInput) => {
+    setLoading(true);
+    try {
+      await registerUser(values);
+      successNotification('Registration Successful.');
+      navigate('/login', { replace: true });
+    } catch (error: any) {
+      errorNotification(
+        error?.response?.data?.errorMessage || 'Registration failed'
+      );
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -122,7 +134,14 @@ const RegisterPage = () => {
               {...form.getInputProps('confirmPassword')}
             />
           </div>
-          <Button radius="md" size="md" type="submit" color="pink">
+          <Button
+            radius="md"
+            size="md"
+            type="submit"
+            color="pink"
+            loading={loading}
+            disabled={loading}
+          >
             Register
           </Button>
           <div className="text-neutral-100 text-sm self-center">

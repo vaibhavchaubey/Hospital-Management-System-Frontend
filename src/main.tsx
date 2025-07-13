@@ -3,7 +3,9 @@ import { createRoot } from 'react-dom/client';
 import './index.css';
 import App from './App.tsx';
 import '@mantine/core/styles.css';
+import '@mantine/notifications/styles.css';
 import { MantineProvider, createTheme } from '@mantine/core';
+import { Notifications } from '@mantine/notifications';
 
 const theme = createTheme({
   focusRing: 'never',
@@ -52,6 +54,7 @@ const theme = createTheme({
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
     <MantineProvider theme={theme}>
+      <Notifications position="top-center" />
       <App />
     </MantineProvider>
   </StrictMode>

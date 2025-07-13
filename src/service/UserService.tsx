@@ -1,5 +1,5 @@
 import axiosInstance from '../Interceptor/AxiosInterceptor';
-import type { RegisterUserInput } from '../types';
+import type { LoginUserInput, RegisterUserInput } from '../types';
 
 const registerUser = async (user: RegisterUserInput) => {
   return axiosInstance
@@ -10,4 +10,13 @@ const registerUser = async (user: RegisterUserInput) => {
     });
 };
 
-export { registerUser };
+const loginUser = async (user: LoginUserInput) => {
+  return axiosInstance
+    .post('user/login', user)
+    .then((response: any) => response.data)
+    .catch((error: any) => {
+      throw error;
+    });
+};
+
+export { registerUser, loginUser };

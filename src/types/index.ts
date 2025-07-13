@@ -5,3 +5,8 @@ export interface RegisterUserInput {
   confirmPassword: string;
   role: 'PATIENT' | 'DOCTOR' | 'ADMIN';
 }
+
+export interface LoginUserInput {
+  email: string;
+  password: string;
+}

@@ -1,10 +1,19 @@
 import { Button, PasswordInput, TextInput } from '@mantine/core';
 import { IconHeartbeat } from '@tabler/icons-react';
 import { useForm } from '@mantine/form';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
+import type { LoginUserInput } from '../types';
+import { useState } from 'react';
+import { loginUser } from '../service/UserService';
+import {
+  errorNotification,
+  successNotification,
+} from '../Utility/NotificationUtil';
 
 const LoginPage = () => {
-  const form = useForm({
+  const navigate = useNavigate();
+  const [loading, setLoading] = useState(false);
+  const form = useForm<LoginUserInput>({
     initialValues: {
       email: '',
       password: '',
@@ -16,8 +25,17 @@ const LoginPage = () => {
     },
   });
 
-  const handleSubmit = (values: typeof form.values) => {
-    console.log(values);
+  const handleSubmit = async (values: LoginUserInput) => {
+    setLoading(true);
+    try {
+      const data = await loginUser(values);
+      successNotification('Login Successful.');
+      navigate('/dashboard', { replace: true });
+    } catch (error: any) {
+      errorNotification(error?.response?.data?.errorMessage || 'Login failed');
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -59,7 +77,14 @@ const LoginPage = () => {
               {...form.getInputProps('password')}
             />
           </div>
-          <Button radius="md" size="md" type="submit" color="pink">
+          <Button
+            radius="md"
+            size="md"
+            type="submit"
+            color="pink"
+            loading={loading}
+            disabled={loading}
+          >
             Login
           </Button>
           <div className="text-neutral-100 text-sm self-center">
