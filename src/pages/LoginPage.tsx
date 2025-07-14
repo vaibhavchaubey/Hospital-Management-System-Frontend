@@ -1,17 +1,21 @@
 import { Button, PasswordInput, TextInput } from '@mantine/core';
-import { IconHeartbeat } from '@tabler/icons-react';
 import { useForm } from '@mantine/form';
-import { Link, useNavigate } from 'react-router-dom';
-import type { LoginUserInput } from '../types';
+import { IconHeartbeat } from '@tabler/icons-react';
+import { jwtDecode } from 'jwt-decode';
 import { useState } from 'react';
+import { useDispatch } from 'react-redux';
+import { Link } from 'react-router-dom';
 import { loginUser } from '../service/UserService';
+import { setJwt } from '../Slices/JwtSlice';
+import { setUser } from '../Slices/UserSlice';
+import type { LoginUserInput } from '../types';
 import {
   errorNotification,
   successNotification,
 } from '../Utility/NotificationUtil';
 
 const LoginPage = () => {
-  const navigate = useNavigate();
+  const dispatch = useDispatch();
   const [loading, setLoading] = useState(false);
   const form = useForm<LoginUserInput>({
     initialValues: {
@@ -30,7 +34,8 @@ const LoginPage = () => {
     try {
       const data = await loginUser(values);
       successNotification('Login Successful.');
-      navigate('/dashboard', { replace: true });
+      dispatch(setJwt(data));
+      dispatch(setUser(jwtDecode(data)));
     } catch (error: any) {
       errorNotification(error?.response?.data?.errorMessage || 'Login failed');
     } finally {
