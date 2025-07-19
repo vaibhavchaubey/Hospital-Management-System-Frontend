@@ -33,7 +33,7 @@ const LoginPage = () => {
     setLoading(true);
     try {
       const data = await loginUser(values);
-      successNotification('Login Successful.');
+      successNotification('Logged in Successfully.');
       dispatch(setJwt(data));
       dispatch(setUser(jwtDecode(data)));
     } catch (error: any) {

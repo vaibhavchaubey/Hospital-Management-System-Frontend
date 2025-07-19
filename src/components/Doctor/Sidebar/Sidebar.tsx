@@ -9,7 +9,7 @@ import {
 } from '@tabler/icons-react';
 import { useSelector } from 'react-redux';
 import { NavLink } from 'react-router-dom';
-import type { User } from '../../types';
+import type { User } from '../../../types';
 
 const links = [
   {
