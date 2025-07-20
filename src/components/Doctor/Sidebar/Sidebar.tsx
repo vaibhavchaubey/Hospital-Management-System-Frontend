@@ -5,6 +5,7 @@ import {
   IconLayoutGrid,
   IconMoodHeart,
   IconStethoscope,
+  IconUser,
   IconVaccine,
 } from '@tabler/icons-react';
 import { useSelector } from 'react-redux';
@@ -14,27 +15,27 @@ import type { User } from '../../../types';
 const links = [
   {
     name: 'Dashboard',
-    url: '/dashboard',
+    url: '/doctor/dashboard',
     icon: <IconLayoutGrid stroke={1.5} />,
   },
   {
-    name: 'Doctors',
-    url: '/doctors',
-    icon: <IconStethoscope stroke={1.5} />,
+    name: 'Profile',
+    url: '/doctor/profile',
+    icon: <IconUser stroke={1.5} />,
   },
   {
     name: 'Patients',
-    url: '/patients',
+    url: '/doctor/patients',
     icon: <IconMoodHeart stroke={1.5} />,
   },
   {
     name: 'Appointments',
-    url: '/appointments',
+    url: '/doctor/appointments',
     icon: <IconCalendarCheck stroke={1.5} />,
   },
   {
     name: 'Pharmacy',
-    url: '/pharmacy',
+    url: '/doctor/pharmacy',
     icon: <IconVaccine stroke={1.5} />,
   },
 ];
@@ -59,7 +60,7 @@ const Sidebar = () => {
             <div className="p-1 bg-white rounded-full shadow-lg">
               <Avatar
                 variant="filled"
-                src="avatar.png"
+                src="/avatar.png"
                 size="xl"
                 alt="it's me"
               />

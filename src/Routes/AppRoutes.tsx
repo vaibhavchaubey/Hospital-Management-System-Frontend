@@ -7,7 +7,9 @@ import RegisterPage from '../pages/RegisterPage';
 import PublicRoute from './PublicRoute';
 import ProtectedRoute from './ProtectedRoute';
 import PatientDashboard from '../components/Layout/PatientDashboard';
-import PatientProfilePage from '../pages/PatientProfilePage';
+import DoctorDashboard from '../components/Layout/DoctorDashboard';
+import DoctorProfilePage from '../pages/Doctor/DoctorProfilePage';
+import PatientProfilePage from '../pages/Patient/PatientProfilePage';
 
 const AppRoutes = () => {
   return (
@@ -44,6 +46,21 @@ const AppRoutes = () => {
         </Route>
 
         <Route
+          path="/doctor"
+          element={
+            <ProtectedRoute>
+              <DoctorDashboard />
+            </ProtectedRoute>
+          }
+        >
+          <Route path="dashboard" element={<Random />} />
+          <Route path="profile" element={<DoctorProfilePage />} />
+          <Route path="pharmacy" element={<Random />} />
+          <Route path="patients" element={<Random />} />
+          <Route path="appointments" element={<Random />} />
+        </Route>
+
+        <Route
           path="/patient"
           element={
             <ProtectedRoute>
@@ -54,7 +71,6 @@ const AppRoutes = () => {
           <Route path="dashboard" element={<Random />} />
           <Route path="profile" element={<PatientProfilePage />} />
           <Route path="appointments" element={<Random />} />
-          <Route path="book" element={<Random />} />
         </Route>
       </Routes>
     </BrowserRouter>

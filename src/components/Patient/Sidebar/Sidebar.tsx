@@ -3,10 +3,7 @@ import {
   IconCalendarCheck,
   IconHeartbeat,
   IconLayoutGrid,
-  IconMoodHeart,
-  IconStethoscope,
   IconUser,
-  IconVaccine,
 } from '@tabler/icons-react';
 import { useSelector } from 'react-redux';
 import { NavLink } from 'react-router-dom';
