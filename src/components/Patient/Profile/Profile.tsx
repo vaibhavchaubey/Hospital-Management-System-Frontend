@@ -19,14 +19,14 @@ import {
   getPatient,
   updatePatient,
 } from '../../../Service/PatientProfileService';
-import type { PatientProfile, User } from '../../../types';
+import type { User } from '../../../types';
 import { formatDate } from '../../../Utility/DateUtility';
-import { bloodGroups } from '../../Data/DropdownData';
 import {
   errorNotification,
   successNotification,
 } from '../../../Utility/NotificationUtil';
-import { arrayToCSV, csvToArray } from '../../../Utility/OtherUtility';
+import { arrayToCSV } from '../../../Utility/OtherUtility';
+import { bloodGroup, bloodGroups } from '../../Data/DropdownData';
 
 const Profile = () => {
   const user: User = useSelector((state: any) => state.user);
@@ -45,11 +45,9 @@ const Profile = () => {
         console.log(data);
         setProfile({
           ...data,
-          allergies: data.allergies
-            ? arrayToCSV(JSON.parse(data.allergies))
-            : null,
+          allergies: data.allergies ? JSON.parse(data.allergies) : null,
           chronicDisease: data.chronicDisease
-            ? arrayToCSV(JSON.parse(data.chronicDisease))
+            ? JSON.parse(data.chronicDisease)
             : null,
         });
       })
@@ -58,13 +56,13 @@ const Profile = () => {
 
   const form = useForm({
     initialValues: {
-      dob: profile.dob,
-      phone: profile.phone,
-      address: profile.address,
-      aadharNo: profile.aadharNo,
-      bloodGroup: profile.bloodGroup,
-      allergies: profile.allergies,
-      chronicDisease: profile.chronicDisease,
+      dob: '',
+      phone: '',
+      address: '',
+      aadharNo: '',
+      bloodGroup: '',
+      allergies: [],
+      chronicDisease: [],
     },
 
     validate: {
@@ -96,7 +94,7 @@ const Profile = () => {
 
     setLoading(true);
     try {
-      console.log({ ...values });
+      console.log('VALUES', { ...values });
       /* JSON.stringify as allergies and chronicDisease are arrays of strings and need to be converted to string */
       const data = await updatePatient({
         ...profile,
@@ -106,7 +104,12 @@ const Profile = () => {
           ? JSON.stringify(values.chronicDisease)
           : null,
       });
-      setProfile(data);
+
+      console.log('DATA', data);
+      setProfile({
+        ...profile,
+        ...values,
+      });
       setEditMode(false);
       successNotification('Profile updated successfully.');
     } catch (error: any) {
@@ -264,7 +267,7 @@ const Profile = () => {
                 </Table.Td>
               ) : (
                 <Table.Td className="text-xl">
-                  {profile.bloodGroup ?? '-'}
+                  {bloodGroup[profile.bloodGroup] ?? '-'}
                 </Table.Td>
               )}
             </Table.Tr>
@@ -279,7 +282,7 @@ const Profile = () => {
                 </Table.Td>
               ) : (
                 <Table.Td className="text-xl">
-                  {profile.allergies ?? '-'}
+                  {arrayToCSV(profile.allergies) ?? '-'}
                 </Table.Td>
               )}
             </Table.Tr>
@@ -296,7 +299,7 @@ const Profile = () => {
                 </Table.Td>
               ) : (
                 <Table.Td className="text-xl">
-                  {profile.chronicDisease ?? '-'}
+                  {arrayToCSV(profile.chronicDisease) ?? '-'}
                 </Table.Td>
               )}
             </Table.Tr>

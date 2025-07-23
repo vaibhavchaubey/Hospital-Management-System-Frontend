@@ -18,7 +18,13 @@ import {
   doctorDepartments,
   doctorSpecializations,
 } from '../../Data/DropdownData';
-import { getDoctor } from '../../../Service/DoctorProfileService';
+import { getDoctor, updateDoctor } from '../../../Service/DoctorProfileService';
+import { useForm } from '@mantine/form';
+import {
+  errorNotification,
+  successNotification,
+} from '../../../Utility/NotificationUtil';
+import { formatDate } from '../../../Utility/DateUtility';
 
 const doctor = {
   dob: '1985-04-15',
@@ -37,13 +43,79 @@ const Profile = () => {
 
   const [editMode, setEditMode] = useState(false);
 
-  const [profile, setProfile] = useState({});
+  const [loading, setLoading] = useState(false);
+
+  const [profile, setProfile] = useState<any>({});
 
   useEffect(() => {
     getDoctor(user.profileId)
-      .then((data: any) => setProfile(data))
+      .then((data: any) => {
+        console.log(data);
+        setProfile({
+          ...data,
+        });
+      })
       .catch((error: any) => console.log(error));
   }, []);
+
+  const form = useForm({
+    initialValues: {
+      dob: '',
+      phone: '',
+      address: '',
+      licenseNo: '',
+      specialization: '',
+      department: '',
+      totalExp: '',
+    },
+
+    validate: {
+      dob: (value) => (!value ? 'Date of Birth is required' : undefined),
+      phone: (value) => (!value ? 'Phone number is required' : undefined),
+      address: (value) => (!value ? 'Address is required' : undefined),
+      licenseNo: (value) => (!value ? 'License number is required' : undefined),
+    },
+  });
+
+  const handleEdit = () => {
+    /* JSON.parse as allergies and chronicDisease are arrays of strings and need to be converted to array */
+    form.setValues({
+      ...profile,
+      dob: profile.dob ? new Date(profile.dob) : undefined,
+    });
+    setEditMode(true);
+  };
+
+  const handleSubmit = async (e: any) => {
+    form.validate();
+    if (!form.isValid()) return;
+    const values = form.getValues();
+
+    setLoading(true);
+    try {
+      console.log('VALUES', { ...values });
+      /* JSON.stringify as allergies and chronicDisease are arrays of strings and need to be converted to string */
+      const data = await updateDoctor({
+        ...profile,
+        ...values,
+      });
+
+      console.log('DATA', data);
+      setProfile({
+        ...profile,
+        ...values,
+      });
+      setEditMode(false);
+      successNotification('Profile updated successfully.');
+    } catch (error: any) {
+      console.log(error);
+      errorNotification(
+        error?.response?.data?.errorMessage || 'Update failed.'
+      );
+    } finally {
+      setLoading(false);
+    }
+  };
 
   return (
     <div className="p-10">
@@ -80,13 +152,21 @@ const Profile = () => {
           <Button
             size="lg"
             variant="filled"
+            type="button"
             leftSection={<IconEdit />}
-            onClick={() => setEditMode(true)}
+            onClick={handleEdit}
           >
             Edit
           </Button>
         ) : (
-          <Button size="lg" variant="filled" onClick={() => setEditMode(false)}>
+          <Button
+            size="lg"
+            variant="filled"
+            type="submit"
+            loading={loading}
+            disabled={loading}
+            onClick={handleSubmit}
+          >
             Submit
           </Button>
         )}
@@ -110,10 +190,15 @@ const Profile = () => {
               </Table.Td>
               {editMode ? (
                 <Table.Td className="text-xl">
-                  <DateInput placeholder="Date of birth" />
+                  <DateInput
+                    {...form.getInputProps('dob')}
+                    placeholder="Date of birth"
+                  />
                 </Table.Td>
               ) : (
-                <Table.Td className="text-xl">{doctor.dob}</Table.Td>
+                <Table.Td className="text-xl">
+                  {formatDate(profile.dob) ?? '-'}
+                </Table.Td>
               )}
             </Table.Tr>
             <Table.Tr>
@@ -121,6 +206,7 @@ const Profile = () => {
               {editMode ? (
                 <Table.Td className="text-xl">
                   <NumberInput
+                    {...form.getInputProps('phone')}
                     placeholder="Phone number"
                     hideControls
                     maxLength={10}
@@ -128,17 +214,22 @@ const Profile = () => {
                   />
                 </Table.Td>
               ) : (
-                <Table.Td className="text-xl">{doctor.phone}</Table.Td>
+                <Table.Td className="text-xl">{profile.phone ?? '-'}</Table.Td>
               )}
             </Table.Tr>
             <Table.Tr>
               <Table.Td className="font-semibold text-xl">Address</Table.Td>
               {editMode ? (
                 <Table.Td className="text-xl">
-                  <TextInput placeholder="Address" />
+                  <TextInput
+                    {...form.getInputProps('address')}
+                    placeholder="Address"
+                  />
                 </Table.Td>
               ) : (
-                <Table.Td className="text-xl">{doctor.address}</Table.Td>
+                <Table.Td className="text-xl">
+                  {profile.address ?? '-'}
+                </Table.Td>
               )}
             </Table.Tr>
             <Table.Tr>
@@ -146,6 +237,7 @@ const Profile = () => {
               {editMode ? (
                 <Table.Td className="text-xl">
                   <NumberInput
+                    {...form.getInputProps('licenseNo')}
                     placeholder="License number"
                     hideControls
                     maxLength={12}
@@ -153,7 +245,9 @@ const Profile = () => {
                   />
                 </Table.Td>
               ) : (
-                <Table.Td className="text-xl">{doctor.licenseNo}</Table.Td>
+                <Table.Td className="text-xl">
+                  {profile.licenseNo ?? '-'}
+                </Table.Td>
               )}
             </Table.Tr>
             <Table.Tr>
@@ -163,22 +257,31 @@ const Profile = () => {
               {editMode ? (
                 <Table.Td className="text-xl">
                   <Select
+                    {...form.getInputProps('specialization')}
                     placeholder="Specialization"
                     data={doctorSpecializations}
                   />
                 </Table.Td>
               ) : (
-                <Table.Td className="text-xl">{doctor.specialization}</Table.Td>
+                <Table.Td className="text-xl">
+                  {profile.specialization ?? '-'}
+                </Table.Td>
               )}
             </Table.Tr>
             <Table.Tr>
               <Table.Td className="font-semibold text-xl">Dapartment</Table.Td>
               {editMode ? (
                 <Table.Td className="text-xl">
-                  <Select placeholder="Dapartment" data={doctorDepartments} />
+                  <Select
+                    {...form.getInputProps('department')}
+                    placeholder="Dapartment"
+                    data={doctorDepartments}
+                  />
                 </Table.Td>
               ) : (
-                <Table.Td className="text-xl">{doctor.department}</Table.Td>
+                <Table.Td className="text-xl">
+                  {profile.department ?? '-'}
+                </Table.Td>
               )}
             </Table.Tr>
             <Table.Tr>
@@ -188,6 +291,7 @@ const Profile = () => {
               {editMode ? (
                 <Table.Td className="text-xl">
                   <NumberInput
+                    {...form.getInputProps('totalExp')}
                     placeholder="Total experience"
                     hideControls
                     maxLength={2}
@@ -197,8 +301,11 @@ const Profile = () => {
                 </Table.Td>
               ) : (
                 <Table.Td className="text-xl">
-                  {' '}
-                  {doctor.totalExp} {doctor.totalExp === 1 ? 'year' : 'years'}
+                  {profile.totalExp
+                    ? `${profile.totalExp} ${
+                        profile.totalExp === 1 ? 'year' : 'years'
+                      }`
+                    : '-'}
                 </Table.Td>
               )}
             </Table.Tr>
