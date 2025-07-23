@@ -236,12 +236,9 @@ const Profile = () => {
               <Table.Td className="font-semibold text-xl">License No</Table.Td>
               {editMode ? (
                 <Table.Td className="text-xl">
-                  <NumberInput
+                  <TextInput
                     {...form.getInputProps('licenseNo')}
                     placeholder="License number"
-                    hideControls
-                    maxLength={12}
-                    clampBehavior="strict"
                   />
                 </Table.Td>
               ) : (
