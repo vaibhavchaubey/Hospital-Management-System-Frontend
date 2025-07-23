@@ -11,13 +11,14 @@ import {
 import { DateInput } from '@mantine/dates';
 import { useDisclosure } from '@mantine/hooks';
 import { IconEdit } from '@tabler/icons-react';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useSelector } from 'react-redux';
 import type { User } from '../../../types';
 import {
   doctorDepartments,
   doctorSpecializations,
 } from '../../Data/DropdownData';
+import { getDoctor } from '../../../Service/DoctorProfileService';
 
 const doctor = {
   dob: '1985-04-15',
@@ -35,6 +36,14 @@ const Profile = () => {
   const [opened, { open, close }] = useDisclosure(false);
 
   const [editMode, setEditMode] = useState(false);
+
+  const [profile, setProfile] = useState({});
+
+  useEffect(() => {
+    getDoctor(user.profileId)
+      .then((data: any) => setProfile(data))
+      .catch((error: any) => console.log(error));
+  }, []);
 
   return (
     <div className="p-10">

@@ -5,7 +5,7 @@ import { jwtDecode } from 'jwt-decode';
 import { useState } from 'react';
 import { useDispatch } from 'react-redux';
 import { Link } from 'react-router-dom';
-import { loginUser } from '../service/UserService';
+import { loginUser } from '../Service/UserService';
 import { setJwt } from '../Slices/JwtSlice';
 import { setUser } from '../Slices/UserSlice';
 import type { LoginUserInput } from '../types';

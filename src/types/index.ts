@@ -18,6 +18,7 @@ export interface User {
   name: string;
   id: number;
   email: string;
+  profileId: number;
   sub: string;
   iat: number;
   exp: number;
@@ -29,4 +30,17 @@ export interface PublicRouteProps {
 
 export interface ProtectedRouteProps {
   children: JSX.Element;
+}
+
+export interface PatientProfile {
+  id: number;
+  name: string;
+  email: string;
+  dob: string;
+  phone: string;
+  address: string;
+  aadharNo: string;
+  bloodGroup: string;
+  allergies: string;
+  chronicDisease: string;
 }

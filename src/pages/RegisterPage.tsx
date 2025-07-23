@@ -8,7 +8,7 @@ import { IconHeartbeat } from '@tabler/icons-react';
 import { useForm } from '@mantine/form';
 import { Link, useNavigate } from 'react-router-dom';
 import type { RegisterUserInput } from '../types';
-import { registerUser } from '../service/UserService';
+import { registerUser } from '../Service/UserService';
 import {
   errorNotification,
   successNotification,

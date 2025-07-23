@@ -10,22 +10,23 @@ import {
   TextInput,
 } from '@mantine/core';
 import { DateInput } from '@mantine/dates';
+import { useForm } from '@mantine/form';
 import { useDisclosure } from '@mantine/hooks';
 import { IconEdit } from '@tabler/icons-react';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useSelector } from 'react-redux';
-import type { User } from '../../../types';
+import {
+  getPatient,
+  updatePatient,
+} from '../../../Service/PatientProfileService';
+import type { PatientProfile, User } from '../../../types';
+import { formatDate } from '../../../Utility/DateUtility';
 import { bloodGroups } from '../../Data/DropdownData';
-
-const patient = {
-  dob: '1995-04-12',
-  phone: '+91-9876543210',
-  address: '221B Baker Street, Mumbai',
-  aadharNo: '1234-5678-9012',
-  bloodGroup: 'A+',
-  allergies: 'Peanuts, Dust',
-  chronicDisease: 'Hypertension',
-};
+import {
+  errorNotification,
+  successNotification,
+} from '../../../Utility/NotificationUtil';
+import { arrayToCSV, csvToArray } from '../../../Utility/OtherUtility';
 
 const Profile = () => {
   const user: User = useSelector((state: any) => state.user);
@@ -33,6 +34,90 @@ const Profile = () => {
   const [opened, { open, close }] = useDisclosure(false);
 
   const [editMode, setEditMode] = useState(false);
+
+  const [loading, setLoading] = useState(false);
+
+  const [profile, setProfile] = useState<any>({});
+
+  useEffect(() => {
+    getPatient(user.profileId)
+      .then((data: any) => {
+        console.log(data);
+        setProfile({
+          ...data,
+          allergies: data.allergies
+            ? arrayToCSV(JSON.parse(data.allergies))
+            : null,
+          chronicDisease: data.chronicDisease
+            ? arrayToCSV(JSON.parse(data.chronicDisease))
+            : null,
+        });
+      })
+      .catch((error: any) => console.log(error));
+  }, []);
+
+  const form = useForm({
+    initialValues: {
+      dob: profile.dob,
+      phone: profile.phone,
+      address: profile.address,
+      aadharNo: profile.aadharNo,
+      bloodGroup: profile.bloodGroup,
+      allergies: profile.allergies,
+      chronicDisease: profile.chronicDisease,
+    },
+
+    validate: {
+      dob: (value) => (!value ? 'Date of Birth is required' : undefined),
+      phone: (value) => (!value ? 'Phone number is required' : undefined),
+      address: (value) => (!value ? 'Address is required' : undefined),
+      aadharNo: (value) => (!value ? 'Aadhar number is required' : undefined),
+    },
+  });
+
+  const handleEdit = () => {
+    /* JSON.parse as allergies and chronicDisease are arrays of strings and need to be converted to array */
+    form.setValues({
+      ...profile,
+      dob: profile.dob ? new Date(profile.dob) : undefined,
+      // chronicDisease: profile.chronicDisease ?? [],
+      // allergies: profile.allergies ?? [],
+
+      chronicDisease: profile.chronicDisease ?? [],
+      allergies: profile.allergies ?? [],
+    });
+    setEditMode(true);
+  };
+
+  const handleSubmit = async (e: any) => {
+    form.validate();
+    if (!form.isValid()) return;
+    const values = form.getValues();
+
+    setLoading(true);
+    try {
+      console.log({ ...values });
+      /* JSON.stringify as allergies and chronicDisease are arrays of strings and need to be converted to string */
+      const data = await updatePatient({
+        ...profile,
+        ...values,
+        allergies: values.allergies ? JSON.stringify(values.allergies) : null,
+        chronicDisease: values.chronicDisease
+          ? JSON.stringify(values.chronicDisease)
+          : null,
+      });
+      setProfile(data);
+      setEditMode(false);
+      successNotification('Profile updated successfully.');
+    } catch (error: any) {
+      console.log(error);
+      errorNotification(
+        error?.response?.data?.errorMessage || 'Update failed.'
+      );
+    } finally {
+      setLoading(false);
+    }
+  };
 
   return (
     <div className="p-10">
@@ -58,7 +143,7 @@ const Profile = () => {
             )}
           </div>
           <div className="flex flex-col gap-3">
-            <div className="text-3xl font-medium text-neutral-900">
+            <div className="text-3xl font-medium text-neutral-900 capitalize">
               {user.name}
             </div>
             <div className="text-xl text-neutral-700">{user.email}</div>
@@ -69,13 +154,21 @@ const Profile = () => {
           <Button
             size="lg"
             variant="filled"
+            type="button"
             leftSection={<IconEdit />}
-            onClick={() => setEditMode(true)}
+            onClick={handleEdit}
           >
             Edit
           </Button>
         ) : (
-          <Button size="lg" variant="filled" onClick={() => setEditMode(false)}>
+          <Button
+            size="lg"
+            variant="filled"
+            type="submit"
+            loading={loading}
+            disabled={loading}
+            onClick={handleSubmit}
+          >
             Submit
           </Button>
         )}
@@ -93,16 +186,21 @@ const Profile = () => {
           withRowBorders={false}
         >
           <Table.Tbody>
-            <Table.Tr>
+            <Table.Tr className="[&>tr]:!mb-3 [&_td]:!w-1/2">
               <Table.Td className="font-semibold text-xl">
                 Date of Birth
               </Table.Td>
               {editMode ? (
                 <Table.Td className="text-xl">
-                  <DateInput placeholder="Date of birth" />
+                  <DateInput
+                    {...form.getInputProps('dob')}
+                    placeholder="Date of birth"
+                  />
                 </Table.Td>
               ) : (
-                <Table.Td className="text-xl">{patient.dob}</Table.Td>
+                <Table.Td className="text-xl">
+                  {formatDate(profile.dob) ?? '-'}
+                </Table.Td>
               )}
             </Table.Tr>
             <Table.Tr>
@@ -110,6 +208,7 @@ const Profile = () => {
               {editMode ? (
                 <Table.Td className="text-xl">
                   <NumberInput
+                    {...form.getInputProps('phone')}
                     placeholder="Phone number"
                     hideControls
                     maxLength={10}
@@ -117,17 +216,22 @@ const Profile = () => {
                   />
                 </Table.Td>
               ) : (
-                <Table.Td className="text-xl">{patient.phone}</Table.Td>
+                <Table.Td className="text-xl">{profile.phone ?? '-'}</Table.Td>
               )}
             </Table.Tr>
             <Table.Tr>
               <Table.Td className="font-semibold text-xl">Address</Table.Td>
               {editMode ? (
                 <Table.Td className="text-xl">
-                  <TextInput placeholder="Address" />
+                  <TextInput
+                    {...form.getInputProps('address')}
+                    placeholder="Address"
+                  />
                 </Table.Td>
               ) : (
-                <Table.Td className="text-xl">{patient.address}</Table.Td>
+                <Table.Td className="text-xl">
+                  {profile.address ?? '-'}
+                </Table.Td>
               )}
             </Table.Tr>
             <Table.Tr>
@@ -135,6 +239,7 @@ const Profile = () => {
               {editMode ? (
                 <Table.Td className="text-xl">
                   <NumberInput
+                    {...form.getInputProps('aadharNo')}
                     placeholder="Aadhar number"
                     hideControls
                     maxLength={12}
@@ -142,27 +247,40 @@ const Profile = () => {
                   />
                 </Table.Td>
               ) : (
-                <Table.Td className="text-xl">{patient.aadharNo}</Table.Td>
+                <Table.Td className="text-xl">
+                  {profile.aadharNo ?? '-'}
+                </Table.Td>
               )}
             </Table.Tr>
             <Table.Tr>
               <Table.Td className="font-semibold text-xl">Blood Group</Table.Td>
               {editMode ? (
                 <Table.Td className="text-xl">
-                  <Select placeholder="Blood group" data={bloodGroups} />
+                  <Select
+                    {...form.getInputProps('bloodGroup')}
+                    placeholder="Blood group"
+                    data={bloodGroups}
+                  />
                 </Table.Td>
               ) : (
-                <Table.Td className="text-xl">{patient.bloodGroup}</Table.Td>
+                <Table.Td className="text-xl">
+                  {profile.bloodGroup ?? '-'}
+                </Table.Td>
               )}
             </Table.Tr>
             <Table.Tr>
               <Table.Td className="font-semibold text-xl">Allergies</Table.Td>
               {editMode ? (
                 <Table.Td className="text-xl">
-                  <TagsInput placeholder="Allergies separated by commas" />
+                  <TagsInput
+                    {...form.getInputProps('allergies')}
+                    placeholder="Allergies separated by commas"
+                  />
                 </Table.Td>
               ) : (
-                <Table.Td className="text-xl">{patient.allergies}</Table.Td>
+                <Table.Td className="text-xl">
+                  {profile.allergies ?? '-'}
+                </Table.Td>
               )}
             </Table.Tr>
             <Table.Tr>
@@ -171,11 +289,14 @@ const Profile = () => {
               </Table.Td>
               {editMode ? (
                 <Table.Td className="text-xl">
-                  <TagsInput placeholder="Chronic Diseases separated by commas" />
+                  <TagsInput
+                    {...form.getInputProps('chronicDisease')}
+                    placeholder="Chronic Diseases separated by commas"
+                  />
                 </Table.Td>
               ) : (
                 <Table.Td className="text-xl">
-                  {patient.chronicDisease}
+                  {profile.chronicDisease ?? '-'}
                 </Table.Td>
               )}
             </Table.Tr>
