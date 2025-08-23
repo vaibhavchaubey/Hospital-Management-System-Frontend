@@ -45,9 +45,17 @@ export interface PatientProfile {
   chronicDisease: string;
 }
 
-export interface ScheduleAppointmentInput {
+export interface ScheduleAppointmentPayload {
+  doctorId: number;
+  patientId: number;
+  appointmentTime: string;
+  reason: string;
+  notes?: string;
+}
+
+export interface ScheduleAppointmentFormValues {
   doctorId: string;
-  patientId: string;
+  patientId: number;
   appointmentTime: Date;
   reason: string;
   notes?: string;

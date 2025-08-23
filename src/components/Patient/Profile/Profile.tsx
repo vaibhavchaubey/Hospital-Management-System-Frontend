@@ -30,6 +30,7 @@ import { bloodGroup, bloodGroups } from '../../Data/DropdownData';
 
 const Profile = () => {
   const user: User = useSelector((state: any) => state.user);
+  console.log('USER ', user);
 
   const [opened, { open, close }] = useDisclosure(false);
 

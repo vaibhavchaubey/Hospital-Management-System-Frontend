@@ -1,4 +1,4 @@
-import { Button, Modal, Select, Textarea } from '@mantine/core';
+import { Button, LoadingOverlay, Modal, Select, Textarea } from '@mantine/core';
 import { FilterMatchMode, FilterOperator } from 'primereact/api';
 import { Calendar } from 'primereact/calendar';
 import { Column } from 'primereact/column';
@@ -13,6 +13,8 @@ import React, { useEffect, useState } from 'react';
 
 // Type-only imports
 import { TextInput } from '@mantine/core';
+import { DateTimePicker } from '@mantine/dates';
+import { useForm } from '@mantine/form';
 import { useDisclosure } from '@mantine/hooks';
 import { IconPlus, IconSearch } from '@tabler/icons-react';
 import type { ColumnFilterElementTemplateOptions } from 'primereact/column';
@@ -20,17 +22,19 @@ import type { DataTableFilterMeta } from 'primereact/datatable';
 import type { DropdownChangeEvent } from 'primereact/dropdown';
 import type { MultiSelectChangeEvent } from 'primereact/multiselect';
 import type { SliderChangeEvent } from 'primereact/slider';
-import { getDoctorDropdowns } from '../../../Service/DoctorProfileService';
-import { DateTimePicker } from '@mantine/dates';
-import { useForm } from '@mantine/form';
-import { appointmentReasons } from '../../Data/DropdownData';
-import type { ScheduleAppointmentInput, User } from '../../../types';
 import { useSelector } from 'react-redux';
 import { scheduleAppointment } from '../../../Service/AppointmentService';
+import { getDoctorDropdowns } from '../../../Service/DoctorProfileService';
+import type {
+  ScheduleAppointmentFormValues,
+  ScheduleAppointmentPayload,
+  User,
+} from '../../../types';
 import {
   errorNotification,
   successNotification,
 } from '../../../Utility/NotificationUtil';
+import { appointmentReasons } from '../../Data/DropdownData';
 
 interface Country {
   name: string;
@@ -466,13 +470,28 @@ const Appointment = () => {
 
   const header = renderHeader();
 
-  const handleSubmit = async (values: ScheduleAppointmentInput) => {
+  const handleSubmit = async (values: ScheduleAppointmentFormValues) => {
     console.log('Form Values:', values);
+
+    const payload: ScheduleAppointmentPayload = {
+      doctorId: Number(values.doctorId),
+      patientId: Number(values.patientId),
+      appointmentTime: new Date(values.appointmentTime)
+        .toISOString()
+        .slice(0, 19), // "yyyy-MM-ddTHH:mm:ss" (backend LocalDateTime format)
+      reason: values.reason,
+      notes: values.notes,
+    };
+
+    console.log('Payload Sent:', payload);
 
     setLoading(true);
     try {
-      const data = await scheduleAppointment(values);
-      successNotification('Appointment Scheduled Successfully.');
+      const data = await scheduleAppointment(payload);
+      console.log(data);
+      close();
+      form.reset();
+      successNotification('Appointment scheduled Successfully.');
     } catch (error: any) {
       errorNotification(
         error?.response?.data?.errorMessage || 'Failed to schedule appointment.'
@@ -603,6 +622,11 @@ const Appointment = () => {
         }
         centered
       >
+        <LoadingOverlay
+          visible={loading}
+          zIndex={1000}
+          overlayProps={{ radius: 'sm', blur: 2 }}
+        />
         <form
           onSubmit={form.onSubmit(handleSubmit)}
           className="grid grid-cols-1 gap-5"
@@ -615,6 +639,7 @@ const Appointment = () => {
             placeholder="Select Doctor"
           />
           <DateTimePicker
+            minDate={new Date()}
             {...form.getInputProps('appointmentTime')}
             withAsterisk
             label="Appointment Time"
@@ -634,13 +659,7 @@ const Appointment = () => {
             placeholder="Enter any additional notes"
           />
 
-          <Button
-            type="submit"
-            variant="filled"
-            fullWidth
-            loading={loading}
-            disabled={loading}
-          >
+          <Button type="submit" variant="filled" fullWidth>
             Submit
           </Button>
         </form>
