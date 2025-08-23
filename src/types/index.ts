@@ -60,3 +60,32 @@ export interface ScheduleAppointmentFormValues {
   reason: string;
   notes?: string;
 }
+
+export type AppointmentStatus = 'SCHEDULED' | 'CANCELLED' | 'COMPLETED';
+
+export interface Appointment {
+  id: number;
+  patientId: number;
+  patientName: string | null;
+  patientEmail: string | null;
+  patientPhone: string | null;
+  doctorId: number;
+  doctorName: string;
+  doctorEmail: string | null;
+  doctorPhone: string | null;
+  appointmentTime: string;
+  status: AppointmentStatus;
+  reason: string;
+  notes: string;
+}
+
+export interface Doctor {
+  id: number;
+  name: string;
+}
+
+// For dropdown UI
+export interface DocotrDropdownOption {
+  value: string;
+  label: string;
+}

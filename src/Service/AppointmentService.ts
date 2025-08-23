@@ -2,7 +2,6 @@ import axiosInstance from '../Interceptor/AxiosInterceptor';
 import type { ScheduleAppointmentPayload } from '../types';
 
 const scheduleAppointment = async (data: ScheduleAppointmentPayload) => {
- 
   return axiosInstance
     .post('appointment/schedule', data)
     .then((response: any) => response.data)
@@ -38,9 +37,19 @@ const getAppointmentDetails = async (id: number) => {
     });
 };
 
-export {
-    cancelAppointment,
-    getAppointment,
-    getAppointmentDetails, scheduleAppointment
+const getAppointmentsByPatient = async (patientId: number) => {
+  return axiosInstance
+    .get('appointment/getAllByPatient/' + patientId)
+    .then((response: any) => response.data)
+    .catch((error: any) => {
+      throw error;
+    });
 };
 
+export {
+  cancelAppointment,
+  getAppointment,
+  getAppointmentDetails,
+  scheduleAppointment,
+  getAppointmentsByPatient,
+};

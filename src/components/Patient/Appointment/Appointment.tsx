@@ -1,13 +1,15 @@
-import { Button, LoadingOverlay, Modal, Select, Textarea } from '@mantine/core';
+import {
+  ActionIcon,
+  Button,
+  LoadingOverlay,
+  Modal,
+  Select,
+  Text,
+  Textarea,
+} from '@mantine/core';
 import { FilterMatchMode, FilterOperator } from 'primereact/api';
-import { Calendar } from 'primereact/calendar';
 import { Column } from 'primereact/column';
 import { DataTable } from 'primereact/datatable';
-import { Dropdown } from 'primereact/dropdown';
-import { InputNumber } from 'primereact/inputnumber';
-import { MultiSelect } from 'primereact/multiselect';
-import { ProgressBar } from 'primereact/progressbar';
-import { Slider } from 'primereact/slider';
 import { Tag } from 'primereact/tag';
 import React, { useEffect, useState } from 'react';
 
@@ -16,20 +18,25 @@ import { TextInput } from '@mantine/core';
 import { DateTimePicker } from '@mantine/dates';
 import { useForm } from '@mantine/form';
 import { useDisclosure } from '@mantine/hooks';
-import { IconPlus, IconSearch } from '@tabler/icons-react';
-import type { ColumnFilterElementTemplateOptions } from 'primereact/column';
+import { modals } from '@mantine/modals';
+import { IconEdit, IconPlus, IconSearch, IconTrash } from '@tabler/icons-react';
 import type { DataTableFilterMeta } from 'primereact/datatable';
-import type { DropdownChangeEvent } from 'primereact/dropdown';
-import type { MultiSelectChangeEvent } from 'primereact/multiselect';
-import type { SliderChangeEvent } from 'primereact/slider';
 import { useSelector } from 'react-redux';
-import { scheduleAppointment } from '../../../Service/AppointmentService';
+import {
+  cancelAppointment,
+  getAppointmentsByPatient,
+  scheduleAppointment,
+} from '../../../Service/AppointmentService';
 import { getDoctorDropdowns } from '../../../Service/DoctorProfileService';
 import type {
+  Appointment,
+  DocotrDropdownOption,
+  Doctor,
   ScheduleAppointmentFormValues,
   ScheduleAppointmentPayload,
   User,
 } from '../../../types';
+import { formatDateWithTime } from '../../../Utility/DateUtility';
 import {
   errorNotification,
   successNotification,
@@ -60,210 +67,76 @@ interface Customer {
 }
 
 const Appointment = () => {
-  const [customers, setCustomers] = useState<Customer[]>([]);
   const [opened, { open, close }] = useDisclosure(false);
-  const [doctors, setDoctors] = useState<any[]>([]);
+  const [doctors, setDoctors] = useState<DocotrDropdownOption[]>([]);
   const [loading, setLoading] = useState(false);
+  const [appointments, setAppointments] = useState<Appointment[]>([]);
 
   const user: User = useSelector((state: any) => state.user);
 
   const [selectedCustomers, setSelectedCustomers] = useState<Customer[]>([]);
   const [filters, setFilters] = useState<DataTableFilterMeta>({
     global: { value: null, matchMode: FilterMatchMode.CONTAINS },
-    name: {
+    doctorName: {
       operator: FilterOperator.AND,
       constraints: [{ value: null, matchMode: FilterMatchMode.STARTS_WITH }],
     },
-    'country.name': {
+    reason: {
       operator: FilterOperator.AND,
       constraints: [{ value: null, matchMode: FilterMatchMode.STARTS_WITH }],
     },
-    representative: { value: null, matchMode: FilterMatchMode.IN },
-    date: {
+    notes: {
       operator: FilterOperator.AND,
-      constraints: [{ value: null, matchMode: FilterMatchMode.DATE_IS }],
-    },
-    balance: {
-      operator: FilterOperator.AND,
-      constraints: [{ value: null, matchMode: FilterMatchMode.EQUALS }],
+      constraints: [{ value: null, matchMode: FilterMatchMode.STARTS_WITH }],
     },
     status: {
-      operator: FilterOperator.OR,
-      constraints: [{ value: null, matchMode: FilterMatchMode.EQUALS }],
+      // value: null,
+      // matchMode: FilterMatchMode.IN,
+      operator: FilterOperator.AND,
+      constraints: [{ value: null, matchMode: FilterMatchMode.STARTS_WITH }],
     },
-    activity: { value: null, matchMode: FilterMatchMode.BETWEEN },
   });
   const [globalFilterValue, setGlobalFilterValue] = useState<string>('');
-  const [representatives] = useState<Representative[]>([
-    { name: 'Amy Elsner', image: 'amyelsner.png' },
-    { name: 'Anna Fali', image: 'annafali.png' },
-    { name: 'Asiya Javayant', image: 'asiyajavayant.png' },
-    { name: 'Bernardo Dominic', image: 'bernardodominic.png' },
-    { name: 'Elwin Sharvill', image: 'elwinsharvill.png' },
-    { name: 'Ioni Bowcher', image: 'ionibowcher.png' },
-    { name: 'Ivan Magalhaes', image: 'ivanmagalhaes.png' },
-    { name: 'Onyama Limba', image: 'onyamalimba.png' },
-    { name: 'Stephen Shaw', image: 'stephenshaw.png' },
-    { name: 'XuXue Feng', image: 'xuxuefeng.png' },
-  ]);
-  const [statuses] = useState<string[]>([
-    'unqualified',
-    'qualified',
-    'new',
-    'negotiation',
-    'renewal',
-  ]);
 
   const getSeverity = (status: string) => {
     switch (status) {
-      case 'unqualified':
+      case 'CANCELLED':
         return 'danger';
 
-      case 'qualified':
+      case 'COMPLETED':
         return 'success';
 
-      case 'new':
+      case 'SCHEDULED':
         return 'info';
 
-      case 'negotiation':
-        return 'warning';
-
-      case 'renewal':
+      default:
         return null;
     }
   };
 
   useEffect(() => {
-    setCustomers([
-      {
-        id: 1001,
-        name: 'Maria Anders',
-        country: {
-          name: 'Germany',
-          code: 'de',
-        },
-        company: 'Alfreds Futterkiste',
-        date: '2016-03-23',
-        status: 'qualified',
-        verified: false,
-        activity: 42,
-        representative: {
-          name: 'Amy Elsner',
-          image: 'amyelsner.png',
-        },
-        balance: 45890,
-      },
-      {
-        id: 1002,
-        name: 'Francisco Chang',
-        country: {
-          name: 'Mexico',
-          code: 'mx',
-        },
-        company: 'Centro comercial Moctezuma',
-        date: '2017-07-11',
-        status: 'new',
-        verified: true,
-        activity: 33,
-        representative: {
-          name: 'Asiya Javayant',
-          image: 'asiyajavayant.png',
-        },
-        balance: 120340,
-      },
-      {
-        id: 1003,
-        name: 'Helen Bennett',
-        country: {
-          name: 'UK',
-          code: 'gb',
-        },
-        company: 'Island Trading',
-        date: '2018-12-05',
-        status: 'unqualified',
-        verified: true,
-        activity: 28,
-        representative: {
-          name: 'Onyama Lim',
-          image: 'onyamalim.png',
-        },
-        balance: 86500,
-      },
-      {
-        id: 1004,
-        name: 'Yoshi Tannamuri',
-        country: {
-          name: 'Japan',
-          code: 'jp',
-        },
-        company: 'Tokyo Traders',
-        date: '2019-06-17',
-        status: 'qualified',
-        verified: false,
-        activity: 14,
-        representative: {
-          name: 'Marcus Aurelius',
-          image: 'marcusaurelius.png',
-        },
-        balance: 43210,
-      },
-      {
-        id: 1005,
-        name: 'Giovanni Rovelli',
-        country: {
-          name: 'Italy',
-          code: 'it',
-        },
-        company: 'Rovelli & Co',
-        date: '2020-01-29',
-        status: 'negotiation',
-        verified: true,
-        activity: 39,
-        representative: {
-          name: 'Isabella Flores',
-          image: 'isabellaflores.png',
-        },
-        balance: 97800,
-      },
-    ]);
-
-    getDoctorDropdowns()
-      .then((data) => {
-        setDoctors(
-          data.map((doctor: any) => ({
-            value: '' + doctor.id,
-            label: doctor.name,
-          }))
+    const fetchData = async () => {
+      try {
+        // ✅ Fetch appointments
+        const appointmentsData: Appointment[] = await getAppointmentsByPatient(
+          user.profileId
         );
-        console.log('Dropdown Data:', data);
-      })
-      .catch((error) => {
-        console.error('Error fetching doctors:', error);
-      });
+        setAppointments(appointmentsData);
+
+        // ✅ Fetch doctors
+        const doctorsData: Doctor[] = await getDoctorDropdowns();
+        const dropdowns: DocotrDropdownOption[] = doctorsData.map((doctor) => ({
+          value: doctor.id.toString(),
+          label: doctor.name,
+        }));
+        setDoctors(dropdowns);
+      } catch (error) {
+        console.error('Error fetching data:', error);
+      }
+    };
+
+    fetchData();
   }, []); // eslint-disable-line react-hooks/exhaustive-deps
-
-  const getCustomers = (data: Customer[]) => {
-    return [...(data || [])].map((d) => {
-      d.date = new Date(d.date);
-
-      return d;
-    });
-  };
-
-  const formatDate = (value: string | Date) => {
-    return new Date(value).toLocaleDateString('en-US', {
-      day: '2-digit',
-      month: '2-digit',
-      year: 'numeric',
-    });
-  };
-
-  const formatCurrency = (value: number) => {
-    return value.toLocaleString('en-US', {
-      style: 'currency',
-      currency: 'USD',
-    });
-  };
 
   const onGlobalFilterChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value;
@@ -310,162 +183,59 @@ const Appointment = () => {
     );
   };
 
-  const countryBodyTemplate = (rowData: Customer) => {
-    return (
-      <div className="flex align-items-center gap-2">
-        <img
-          alt="flag"
-          src="https://primefaces.org/cdn/primereact/images/flag/flag_placeholder.png"
-          className={`flag flag-${rowData.country.code}`}
-          style={{ width: '24px' }}
-        />
-        <span>{rowData.country.name}</span>
-      </div>
-    );
-  };
-
-  const representativeBodyTemplate = (rowData: Customer) => {
-    const representative = rowData.representative;
-
-    return (
-      <div className="flex align-items-center gap-2">
-        <img
-          alt={representative.name}
-          src={`https://primefaces.org/cdn/primereact/images/avatar/${representative.image}`}
-          width="32"
-        />
-        <span>{representative.name}</span>
-      </div>
-    );
-  };
-
-  const representativeFilterTemplate = (
-    options: ColumnFilterElementTemplateOptions
-  ) => {
-    return (
-      <React.Fragment>
-        <div className="mb-3 font-bold">Agent Picker</div>
-        <MultiSelect
-          value={options.value}
-          options={representatives}
-          itemTemplate={representativesItemTemplate}
-          onChange={(e: MultiSelectChangeEvent) =>
-            options.filterCallback(e.value)
-          }
-          optionLabel="name"
-          placeholder="Any"
-          className="p-column-filter"
-        />
-      </React.Fragment>
-    );
-  };
-
-  const representativesItemTemplate = (option: Representative) => {
-    return (
-      <div className="flex align-items-center gap-2">
-        <img
-          alt={option.name}
-          src={`https://primefaces.org/cdn/primereact/images/avatar/${option.image}`}
-          width="32"
-        />
-        <span>{option.name}</span>
-      </div>
-    );
-  };
-
-  const dateBodyTemplate = (rowData: Customer) => {
-    return formatDate(rowData.date);
-  };
-
-  const dateFilterTemplate = (options: ColumnFilterElementTemplateOptions) => {
-    return (
-      <Calendar
-        value={options.value}
-        onChange={(e) => options.filterCallback(e.value, options.index)}
-        dateFormat="mm/dd/yy"
-        placeholder="mm/dd/yyyy"
-        mask="99/99/9999"
-      />
-    );
-  };
-
-  const balanceBodyTemplate = (rowData: Customer) => {
-    return formatCurrency(rowData.balance);
-  };
-
-  const balanceFilterTemplate = (
-    options: ColumnFilterElementTemplateOptions
-  ) => {
-    return (
-      <InputNumber
-        value={options.value}
-        onChange={(e) => options.filterCallback(e.value, options.index)}
-        mode="currency"
-        currency="USD"
-        locale="en-US"
-      />
-    );
-  };
-
-  const statusBodyTemplate = (rowData: Customer) => {
+  const statusBodyTemplate = (rowData: Appointment) => {
     return (
       <Tag value={rowData.status} severity={getSeverity(rowData.status)} />
     );
   };
 
-  const statusFilterTemplate = (
-    options: ColumnFilterElementTemplateOptions
-  ) => {
+  const handleDelete = (rowData: Appointment) => {
+    modals.openConfirmModal({
+      title: (
+        <span className="text-xl font-serif font-semibold">Are You sure</span>
+      ),
+      centered: true,
+      children: (
+        <Text size="sm">
+          You want to cancel this appointment? This action cannot be undone.
+        </Text>
+      ),
+      labels: { confirm: 'Confirm', cancel: 'Cancel' },
+
+      onConfirm: () => {
+        cancelAppointment(rowData.id)
+          .then(() => {
+            successNotification('Appointment cancelled successfully');
+            // Update the local state to remove the cancelled appointment
+            setAppointments((prev) =>
+              prev.map((appointment) =>
+                appointment.id === rowData.id
+                  ? { ...appointment, status: 'CANCELLED' }
+                  : appointment
+              )
+            );
+          })
+          .catch((error) => {
+            errorNotification(
+              error?.response?.data?.errorMessage ||
+                'Failed to cancel appointment.'
+            );
+          });
+      },
+    });
+  };
+
+  const actionBodyTemplate = (rowData: Appointment) => {
     return (
-      <Dropdown
-        value={options.value}
-        options={statuses}
-        onChange={(e: DropdownChangeEvent) =>
-          options.filterCallback(e.value, options.index)
-        }
-        itemTemplate={statusItemTemplate}
-        placeholder="Select One"
-        className="p-column-filter"
-        showClear
-      />
+      <div className="flex gap-2">
+        <ActionIcon>
+          <IconEdit size={20} stroke={1.5} />
+        </ActionIcon>
+        <ActionIcon color="red" onClick={() => handleDelete(rowData)}>
+          <IconTrash size={20} stroke={1.5} />
+        </ActionIcon>
+      </div>
     );
-  };
-
-  const statusItemTemplate = (option: string) => {
-    return <Tag value={option} severity={getSeverity(option)} />;
-  };
-
-  const activityBodyTemplate = (rowData: Customer) => {
-    return (
-      <ProgressBar
-        value={rowData.activity}
-        showValue={false}
-        style={{ height: '6px' }}
-      ></ProgressBar>
-    );
-  };
-
-  const activityFilterTemplate = (
-    options: ColumnFilterElementTemplateOptions
-  ) => {
-    return (
-      <>
-        <Slider
-          value={options.value}
-          onChange={(e: SliderChangeEvent) => options.filterCallback(e.value)}
-          range
-          className="m-3"
-        ></Slider>
-        <div className="flex align-items-center justify-content-between px-2">
-          <span>{options.value ? options.value[0] : 0}</span>
-          <span>{options.value ? options.value[1] : 100}</span>
-        </div>
-      </>
-    );
-  };
-
-  const actionBodyTemplate = () => {
-    return <Button type="button"></Button>;
   };
 
   const header = renderHeader();
@@ -501,88 +271,58 @@ const Appointment = () => {
     }
   };
 
+  const timeTemplate = (rowData: Appointment) => {
+    return <span>{formatDateWithTime(rowData.appointmentTime)}</span>;
+  };
+
   return (
     <div className="card">
       <DataTable
-        value={customers}
+        stripedRows
+        value={appointments}
+        size="small"
         paginator
         header={header}
         rows={10}
         paginatorTemplate="FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink CurrentPageReport RowsPerPageDropdown"
         rowsPerPageOptions={[10, 25, 50]}
         dataKey="id"
-        selectionMode="checkbox"
-        selection={selectedCustomers}
-        onSelectionChange={(e) => {
-          const customers = e.value as Customer[];
-          setSelectedCustomers(customers);
-        }}
         filters={filters}
         filterDisplay="menu"
-        globalFilterFields={[
-          'name',
-          'country.name',
-          'representative.name',
-          'balance',
-          'status',
-        ]}
-        emptyMessage="No customers found."
+        globalFilterFields={['doctorName', 'reason', 'notes', 'status']}
+        emptyMessage="No appointment found."
         currentPageReportTemplate="Showing {first} to {last} of {totalRecords} entries"
       >
         <Column
-          selectionMode="multiple"
-          headerStyle={{ width: '3rem' }}
-        ></Column>
-        <Column
-          field="name"
-          header="Name"
+          field="doctorName"
+          header="Doctor"
           sortable
           filter
           filterPlaceholder="Search by name"
           style={{ minWidth: '14rem' }}
         />
         <Column
-          field="country.name"
-          header="Country"
+          field="appointmentTime"
+          header="Appointment Time"
           sortable
-          filterField="country.name"
           style={{ minWidth: '14rem' }}
-          body={countryBodyTemplate}
-          filter
-          filterPlaceholder="Search by country"
+          body={timeTemplate}
         />
         <Column
-          header="Agent"
+          field="reason"
+          header="Reason"
           sortable
-          sortField="representative.name"
-          filterField="representative"
-          showFilterMatchModes={false}
-          filterMenuStyle={{ width: '14rem' }}
+          filter
+          filterPlaceholder="Search by name"
           style={{ minWidth: '14rem' }}
-          body={representativeBodyTemplate}
-          filter
-          filterElement={representativeFilterTemplate}
         />
         <Column
-          field="date"
-          header="Date"
+          field="notes"
+          header="Notes"
           sortable
-          filterField="date"
-          dataType="date"
-          style={{ minWidth: '12rem' }}
-          body={dateBodyTemplate}
           filter
-          filterElement={dateFilterTemplate}
-        />
-        <Column
-          field="balance"
-          header="Balance"
-          sortable
-          dataType="numeric"
-          style={{ minWidth: '12rem' }}
-          body={balanceBodyTemplate}
-          filter
-          filterElement={balanceFilterTemplate}
+          filterPlaceholder="Search by name"
+          style={{ minWidth: '14rem' }}
         />
         <Column
           field="status"
@@ -592,17 +332,6 @@ const Appointment = () => {
           style={{ minWidth: '12rem' }}
           body={statusBodyTemplate}
           filter
-          filterElement={statusFilterTemplate}
-        />
-        <Column
-          field="activity"
-          header="Activity"
-          sortable
-          showFilterMatchModes={false}
-          style={{ minWidth: '12rem' }}
-          body={activityBodyTemplate}
-          filter
-          filterElement={activityFilterTemplate}
         />
         <Column
           headerStyle={{ width: '5rem', textAlign: 'center' }}

@@ -12,6 +12,7 @@ import '@mantine/notifications/styles.css';
 import '@mantine/dates/styles.css';
 
 import { MantineProvider, createTheme } from '@mantine/core';
+import { ModalsProvider } from '@mantine/modals';
 import { Notifications } from '@mantine/notifications';
 
 import { Provider } from 'react-redux';
@@ -60,10 +61,12 @@ createRoot(document.getElementById('root')!).render(
   <StrictMode>
     <Provider store={store}>
       <MantineProvider theme={theme}>
-        <PrimeReactProvider>
-          <Notifications position="top-center" />
-          <App />
-        </PrimeReactProvider>
+        <ModalsProvider>
+          <PrimeReactProvider>
+            <Notifications position="top-center" />
+            <App />
+          </PrimeReactProvider>
+        </ModalsProvider>
       </MantineProvider>
     </Provider>
   </StrictMode>
