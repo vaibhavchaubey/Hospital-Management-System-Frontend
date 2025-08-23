@@ -49,4 +49,27 @@ const doctorDepartments = [
   'Nephrology',
 ];
 
-export { bloodGroups, bloodGroup, doctorSpecializations, doctorDepartments };
+const appointmentReasons = [
+  'General Checkup',
+  'Follow-up Visit',
+  'Fever / Cold / Flu',
+  'Headache / Migraine',
+  'Stomach Pain',
+  'Chest Pain',
+  'Skin Issues / Allergies',
+  'Diabetes Management',
+  'Blood Pressure / Hypertension',
+  'Cardiac Consultation',
+  'Bone / Joint Pain',
+  'Pregnancy Checkup',
+  'Child Health Consultation',
+  'Mental Health / Counseling',
+  'Surgery Consultation',
+  'Vaccination',
+  'Lab Test Review',
+  'Prescription Refill',
+  'Emergency Consultation',
+  'Other',
+];
+
+export { bloodGroups, bloodGroup, doctorSpecializations, doctorDepartments, appointmentReasons };

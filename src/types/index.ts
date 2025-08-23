@@ -44,3 +44,11 @@ export interface PatientProfile {
   allergies: string;
   chronicDisease: string;
 }
+
+export interface ScheduleAppointmentInput {
+  doctorId: string;
+  patientId: string;
+  appointmentTime: Date;
+  reason: string;
+  notes?: string;
+}
