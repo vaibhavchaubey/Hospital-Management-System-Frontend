@@ -52,4 +52,22 @@ const formatDateWithTime = (dateString: string): string => {
   return `${dayName}, ${date.toLocaleString('en-US', options)}`;
 };
 
-export { formatDate, formatDateWithTime };
+const formatLocalDateTime = (date: Date) => {
+  const pad = (n: number) => (n < 10 ? '0' + n : n);
+
+  return (
+    date.getFullYear() +
+    '-' +
+    pad(date.getMonth() + 1) +
+    '-' +
+    pad(date.getDate()) +
+    'T' +
+    pad(date.getHours()) +
+    ':' +
+    pad(date.getMinutes()) +
+    ':' +
+    pad(date.getSeconds())
+  );
+};
+
+export { formatDate, formatDateWithTime, formatLocalDateTime };

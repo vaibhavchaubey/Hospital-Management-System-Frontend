@@ -11,6 +11,7 @@ import DoctorDashboard from '../components/Layout/DoctorDashboard';
 import DoctorProfilePage from '../pages/Doctor/DoctorProfilePage';
 import PatientProfilePage from '../pages/Patient/PatientProfilePage';
 import PatientAppointmentPage from '../pages/Patient/PatientAppointmentPage';
+import DoctorAppointmentPage from '../pages/Doctor/DoctorAppointmentPage';
 
 const AppRoutes = () => {
   return (
@@ -58,7 +59,7 @@ const AppRoutes = () => {
           <Route path="profile" element={<DoctorProfilePage />} />
           <Route path="pharmacy" element={<Random />} />
           <Route path="patients" element={<Random />} />
-          <Route path="appointments" element={<Random />} />
+          <Route path="appointments" element={<DoctorAppointmentPage />} />
         </Route>
 
         <Route

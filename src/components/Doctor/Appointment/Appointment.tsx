@@ -20,12 +20,13 @@ import { DateTimePicker } from '@mantine/dates';
 import { useForm } from '@mantine/form';
 import { useDisclosure } from '@mantine/hooks';
 import { modals } from '@mantine/modals';
-import { IconEdit, IconPlus, IconSearch, IconTrash } from '@tabler/icons-react';
+import { IconPlus, IconSearch, IconTrash } from '@tabler/icons-react';
 import type { DataTableFilterMeta } from 'primereact/datatable';
+import { Toolbar } from 'primereact/toolbar';
 import { useSelector } from 'react-redux';
 import {
   cancelAppointment,
-  getAppointmentsByPatient,
+  getAppointmentsByDoctor,
   scheduleAppointment,
 } from '../../../Service/AppointmentService';
 import { getDoctorDropdowns } from '../../../Service/DoctorProfileService';
@@ -37,16 +38,12 @@ import type {
   ScheduleAppointmentPayload,
   User,
 } from '../../../types';
-import {
-  formatDateWithTime,
-  formatLocalDateTime,
-} from '../../../Utility/DateUtility';
+import { formatDateWithTime } from '../../../Utility/DateUtility';
 import {
   errorNotification,
   successNotification,
 } from '../../../Utility/NotificationUtil';
 import { appointmentReasons } from '../../Data/DropdownData';
-import { Toolbar } from 'primereact/toolbar';
 
 const Appointment = () => {
   const [opened, { open, close }] = useDisclosure(false);
@@ -60,7 +57,7 @@ const Appointment = () => {
 
   const [filters, setFilters] = useState<DataTableFilterMeta>({
     global: { value: null, matchMode: FilterMatchMode.CONTAINS },
-    doctorName: {
+    patientName: {
       operator: FilterOperator.AND,
       constraints: [{ value: null, matchMode: FilterMatchMode.STARTS_WITH }],
     },
@@ -105,7 +102,7 @@ const Appointment = () => {
   const fetchAppointmentsData = async () => {
     try {
       // ✅ Fetch appointments
-      const appointmentsData: Appointment[] = await getAppointmentsByPatient(
+      const appointmentsData: Appointment[] = await getAppointmentsByDoctor(
         user.profileId
       );
       setAppointments(appointmentsData);
@@ -219,9 +216,6 @@ const Appointment = () => {
   const actionBodyTemplate = (rowData: Appointment) => {
     return (
       <div className="flex gap-2">
-        <ActionIcon>
-          <IconEdit size={20} stroke={1.5} />
-        </ActionIcon>
         <ActionIcon color="red" onClick={() => handleDelete(rowData)}>
           <IconTrash size={20} stroke={1.5} />
         </ActionIcon>
@@ -237,7 +231,9 @@ const Appointment = () => {
     const payload: ScheduleAppointmentPayload = {
       doctorId: Number(values.doctorId),
       patientId: Number(values.patientId),
-      appointmentTime: formatLocalDateTime(new Date(values.appointmentTime)), // "yyyy-MM-ddTHH:mm:ss" (backend LocalDateTime format)
+      appointmentTime: new Date(values.appointmentTime)
+        .toISOString()
+        .slice(0, 19), // "yyyy-MM-ddTHH:mm:ss" (backend LocalDateTime format)
       reason: values.reason,
       notes: values.notes,
     };
@@ -265,14 +261,6 @@ const Appointment = () => {
     return <span>{formatDateWithTime(rowData.appointmentTime)}</span>;
   };
 
-  const leftToolbarTemplate = () => {
-    return (
-      <Button leftSection={<IconPlus />} onClick={open} variant="filled">
-        Schedule Appoinment
-      </Button>
-    );
-  };
-
   const rightToolbarTemplate = () => {
     return (
       <TextInput
@@ -285,7 +273,7 @@ const Appointment = () => {
     );
   };
 
-  const centerToolbarTemplate = () => {
+  const leftToolbarTemplate = () => {
     return (
       <SegmentedControl
         variant="filled"
@@ -335,7 +323,6 @@ const Appointment = () => {
       <Toolbar
         className="mb-4"
         start={leftToolbarTemplate}
-        center={centerToolbarTemplate}
         end={rightToolbarTemplate}
       ></Toolbar>
       <DataTable
@@ -349,17 +336,25 @@ const Appointment = () => {
         dataKey="id"
         filters={filters}
         filterDisplay="menu"
-        globalFilterFields={['doctorName', 'reason', 'notes', 'status']}
+        globalFilterFields={['patientName', 'reason', 'notes', 'status']}
         emptyMessage="No appointment found."
         currentPageReportTemplate="Showing {first} to {last} of {totalRecords} entries"
       >
         <Column
-          field="doctorName"
-          header="Doctor"
+          field="patientName"
+          header="Patient"
           sortable
           filter
           filterPlaceholder="Search by name"
           style={{ minWidth: '14rem' }}
+        />
+        <Column
+          field="patientPhone"
+          header="Phone"
+          style={{ minWidth: '14rem' }}
+          body={(rowData: Appointment) =>
+            rowData.patientPhone ? rowData.patientPhone : '-'
+          }
         />
         <Column
           field="appointmentTime"
