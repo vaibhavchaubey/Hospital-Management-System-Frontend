@@ -20,7 +20,7 @@ import { DateTimePicker } from '@mantine/dates';
 import { useForm } from '@mantine/form';
 import { useDisclosure } from '@mantine/hooks';
 import { modals } from '@mantine/modals';
-import { IconPlus, IconSearch, IconTrash } from '@tabler/icons-react';
+import { IconEye, IconPlus, IconSearch, IconTrash } from '@tabler/icons-react';
 import type { DataTableFilterMeta } from 'primereact/datatable';
 import { Toolbar } from 'primereact/toolbar';
 import { useSelector } from 'react-redux';
@@ -44,8 +44,10 @@ import {
   successNotification,
 } from '../../../Utility/NotificationUtil';
 import { appointmentReasons } from '../../Data/DropdownData';
+import { useNavigate } from 'react-router-dom';
 
 const Appointment = () => {
+  const navigate = useNavigate();
   const [opened, { open, close }] = useDisclosure(false);
   const [doctors, setDoctors] = useState<DocotrDropdownOption[]>([]);
   const [loading, setLoading] = useState(false);
@@ -216,6 +218,9 @@ const Appointment = () => {
   const actionBodyTemplate = (rowData: Appointment) => {
     return (
       <div className="flex gap-2">
+        <ActionIcon onClick={() => navigate('' + rowData.id)}>
+          <IconEye size={20} stroke={1.5} />
+        </ActionIcon>
         <ActionIcon color="red" onClick={() => handleDelete(rowData)}>
           <IconTrash size={20} stroke={1.5} />
         </ActionIcon>

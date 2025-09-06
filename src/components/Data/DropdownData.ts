@@ -72,4 +72,48 @@ const appointmentReasons = [
   'Other',
 ];
 
-export { bloodGroups, bloodGroup, doctorSpecializations, doctorDepartments, appointmentReasons };
+const symptoms = [
+  'Fever',
+  'Cough',
+  'Headache',
+  'Fatigue',
+  'Sore throat',
+  'Shortness of breath',
+  'Chest pain',
+  'Nausea',
+  'Dizziness',
+  'Body aches',
+  'Loss of appetite',
+  'Vomiting',
+  'Diarrhea',
+  'Back pain',
+  'Joint pain',
+];
+
+const tests = [
+  'Blood Test',
+  'Urine Test',
+  'X-Ray',
+  'MRI Scan',
+  'CT Scan',
+  'ECG',
+  'EEG',
+  'Liver Function Test',
+  'Kidney Function Test',
+  'Thyroid Function Test',
+  'Blood Sugar Test',
+  'Cholesterol Test',
+  'Allergy Test',
+  'Ultrasound',
+  'Vitamin D Test',
+];
+
+export {
+  bloodGroups,
+  bloodGroup,
+  doctorSpecializations,
+  doctorDepartments,
+  appointmentReasons,
+  symptoms,
+  tests,
+};
