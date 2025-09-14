@@ -8,11 +8,7 @@ import {
   Text,
 } from '@mantine/core';
 import {
-  IconClipboard,
   IconClipboardHeart,
-  IconMessageCircle,
-  IconPhoto,
-  IconSettings,
   IconStethoscope,
   IconVaccine,
 } from '@tabler/icons-react';
@@ -21,6 +17,7 @@ import { Link, useParams } from 'react-router-dom';
 import { getAppointmentDetails } from '../../../Service/AppointmentService';
 import { formatDateWithTime } from '../../../Utility/DateUtility';
 import AppointmentReport from './AppointmentReport';
+import Prescriptions from './Prescriptions';
 
 const AppointmentDetails = () => {
   const { id } = useParams();
@@ -125,10 +122,12 @@ const AppointmentDetails = () => {
 
           <Tabs.Panel value="medical">Medical History</Tabs.Panel>
 
-          <Tabs.Panel value="prescriptions">Prescriptions</Tabs.Panel>
+          <Tabs.Panel value="prescriptions">
+            <Prescriptions appointment={appointment} />
+          </Tabs.Panel>
 
           <Tabs.Panel value="reports">
-            <AppointmentReport />
+            <AppointmentReport appointment={appointment} />
           </Tabs.Panel>
         </Tabs>
       </div>

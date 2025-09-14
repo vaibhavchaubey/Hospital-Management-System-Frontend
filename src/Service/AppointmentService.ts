@@ -55,6 +55,42 @@ const getAppointmentsByDoctor = async (doctorId: number) => {
     });
 };
 
+const createAppointmentReport = async (data: any) => {
+  return axiosInstance
+    .post('/appointment/report/create', data)
+    .then((response: any) => response.data)
+    .catch((error: any) => {
+      throw error;
+    });
+};
+
+const isReportExists = async (appointmentId: number) => {
+  return axiosInstance
+    .get('/appointment/report/isRecordExists/' + appointmentId)
+    .then((response: any) => response.data)
+    .catch((error: any) => {
+      throw error;
+    });
+};
+
+const getReportsByPatientId = async (patientId: number) => {
+  return axiosInstance
+    .get('/appointment/report/getRecordsByPatientId/' + patientId)
+    .then((response: any) => response.data)
+    .catch((error: any) => {
+      throw error;
+    });
+};
+
+const getPrescriptionsByPatientId = async (patientId: number) => {
+  return axiosInstance
+    .get('/appointment/report/getPrescriptionsByPatientId/' + patientId)
+    .then((response: any) => response.data)
+    .catch((error: any) => {
+      throw error;
+    });
+};
+
 export {
   cancelAppointment,
   getAppointment,
@@ -62,4 +98,8 @@ export {
   scheduleAppointment,
   getAppointmentsByPatient,
   getAppointmentsByDoctor,
+  createAppointmentReport,
+  isReportExists,
+  getReportsByPatientId,
+  getPrescriptionsByPatientId,
 };

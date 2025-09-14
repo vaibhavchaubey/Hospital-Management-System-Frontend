@@ -108,6 +108,22 @@ const tests = [
   'Vitamin D Test',
 ];
 
+const dosageFrequencies = [
+  "1-0-0",  // Once daily in the morning
+  "0-1-0",  // Once daily in the afternoon
+  "0-0-1",  // Once daily at night
+  "1-0-1",  // Morning & night
+  "1-1-0",  // Morning & afternoon
+  "0-1-1",  // Afternoon & night
+  "1-1-1",  // Morning, afternoon, night (thrice daily)
+  "2-0-2",  // Two tablets morning & night
+  "1-0-2",  // Morning & two at night
+  "2-2-2"   // High-frequency dosing
+]
+
+
+
+
 export {
   bloodGroups,
   bloodGroup,
@@ -116,4 +132,5 @@ export {
   appointmentReasons,
   symptoms,
   tests,
+  dosageFrequencies
 };
