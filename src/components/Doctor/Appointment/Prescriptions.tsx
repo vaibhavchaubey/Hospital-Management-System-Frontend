@@ -82,11 +82,11 @@ const Prescriptions = ({ appointment }: any) => {
         rowsPerPageOptions={[10, 25, 50]}
         dataKey="id"
         filterDisplay="menu"
-        globalFilterFields={['patientName', 'reason', 'notes', 'status']}
+        globalFilterFields={['doctorName', 'notes']}
         emptyMessage="No appointment found."
         currentPageReportTemplate="Showing {first} to {last} of {totalRecords} entries"
       >
-        <Column field="doctorName" header="Doctor" sortable />
+        <Column field="doctorName" header="Doctor" />
 
         <Column
           field="prescriptionDate"
@@ -97,7 +97,6 @@ const Prescriptions = ({ appointment }: any) => {
         <Column
           field="medicine"
           header="Medicines"
-          sortable
           body={(rowData) => rowData.medicines?.length ?? 0}
         />
 
