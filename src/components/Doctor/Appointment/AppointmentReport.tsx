@@ -8,25 +8,25 @@ import {
   Textarea,
   TextInput,
 } from '@mantine/core';
-import { dosageFrequencies, symptoms, tests } from '../../Data/DropdownData';
-import { IconEye, IconSearch, IconTrash } from '@tabler/icons-react';
 import { useForm } from '@mantine/form';
+import { IconSearch, IconTrash } from '@tabler/icons-react';
+import { FilterMatchMode } from 'primereact/api';
+import { Column } from 'primereact/column';
+import { DataTable, type DataTableFilterMeta } from 'primereact/datatable';
+import { useEffect, useState } from 'react';
+import { useDispatch } from 'react-redux';
+import { useNavigate } from 'react-router-dom';
 import {
   createAppointmentReport,
   getReportsByPatientId,
   isReportExists,
 } from '../../../Service/AppointmentService';
+import { formatDate } from '../../../Utility/DateUtility';
 import {
   errorNotification,
   successNotification,
 } from '../../../Utility/NotificationUtil';
-import { useDispatch } from 'react-redux';
-import { useEffect, useState } from 'react';
-import { DataTable, type DataTableFilterMeta } from 'primereact/datatable';
-import { Navigate, useNavigate } from 'react-router-dom';
-import { FilterMatchMode } from 'primereact/api';
-import { Column } from 'primereact/column';
-import { formatDate } from '../../../Utility/DateUtility';
+import { dosageFrequencies, symptoms, tests } from '../../Data/DropdownData';
 
 type Medicine = {
   name: string;

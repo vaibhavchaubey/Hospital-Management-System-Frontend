@@ -1,19 +1,17 @@
-import { ActionIcon, TextInput, Title } from '@mantine/core';
+import { ActionIcon, Card, Divider, Grid, Modal, Text, TextInput, Title } from '@mantine/core';
+import { useDisclosure } from '@mantine/hooks';
 import {
   IconEye,
   IconMedicineSyrup,
-  IconSearch,
-  IconTrash,
+  IconSearch
 } from '@tabler/icons-react';
-import { Card, Text, Grid, Divider, Modal, Button } from '@mantine/core';
 import { FilterMatchMode } from 'primereact/api';
 import { Column } from 'primereact/column';
 import { DataTable, type DataTableFilterMeta } from 'primereact/datatable';
 import { useEffect, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { getPrescriptionsByPatientId } from '../../../Service/AppointmentService';
 import { formatDate } from '../../../Utility/DateUtility';
-import { useNavigate } from 'react-router-dom';
-import { useDisclosure } from '@mantine/hooks';
 
 const Prescriptions = ({ appointment }: any) => {
   const [data, setData] = useState<any[]>([]);

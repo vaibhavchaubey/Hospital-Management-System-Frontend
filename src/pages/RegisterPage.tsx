@@ -4,16 +4,16 @@ import {
   SegmentedControl,
   TextInput,
 } from '@mantine/core';
-import { IconHeartbeat } from '@tabler/icons-react';
 import { useForm } from '@mantine/form';
+import { IconHeartbeat } from '@tabler/icons-react';
+import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import type { RegisterUserInput } from '../types';
 import { registerUser } from '../Service/UserService';
+import type { RegisterUserInput } from '../types';
 import {
   errorNotification,
   successNotification,
 } from '../Utility/NotificationUtil';
-import { useState } from 'react';
 
 const RegisterPage = () => {
   const navigate = useNavigate();
