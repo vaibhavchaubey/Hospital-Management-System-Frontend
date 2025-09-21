@@ -1,5 +1,11 @@
-import { ActionIcon, TextInput } from '@mantine/core';
-import { IconEye, IconSearch, IconTrash } from '@tabler/icons-react';
+import { ActionIcon, TextInput, Title } from '@mantine/core';
+import {
+  IconEye,
+  IconMedicineSyrup,
+  IconSearch,
+  IconTrash,
+} from '@tabler/icons-react';
+import { Card, Text, Grid, Divider, Modal, Button } from '@mantine/core';
 import { FilterMatchMode } from 'primereact/api';
 import { Column } from 'primereact/column';
 import { DataTable, type DataTableFilterMeta } from 'primereact/datatable';
@@ -7,9 +13,12 @@ import { useEffect, useState } from 'react';
 import { getPrescriptionsByPatientId } from '../../../Service/AppointmentService';
 import { formatDate } from '../../../Utility/DateUtility';
 import { useNavigate } from 'react-router-dom';
+import { useDisclosure } from '@mantine/hooks';
 
 const Prescriptions = ({ appointment }: any) => {
   const [data, setData] = useState<any[]>([]);
+  const [opened, { open, close }] = useDisclosure(false);
+  const [medicinesData, setMedicinesData] = useState<any>([]);
   const navigate = useNavigate();
 
   const [filters, setFilters] = useState<DataTableFilterMeta>({
@@ -39,6 +48,11 @@ const Prescriptions = ({ appointment }: any) => {
       });
   }, [appointment?.patientId]);
 
+  const handleMedicine = (medicines: any[]) => {
+    open();
+    setMedicinesData(medicines);
+  };
+
   const actionBodyTemplate = (rowData: any) => {
     return (
       <div className="flex gap-2">
@@ -48,6 +62,12 @@ const Prescriptions = ({ appointment }: any) => {
           }
         >
           <IconEye size={20} stroke={1.5} />
+        </ActionIcon>
+        <ActionIcon
+          color="red"
+          onClick={() => handleMedicine(rowData.medicines)}
+        >
+          <IconMedicineSyrup size={20} stroke={1.5} />
         </ActionIcon>
       </div>
     );
@@ -107,6 +127,84 @@ const Prescriptions = ({ appointment }: any) => {
           body={actionBodyTemplate}
         />
       </DataTable>
+      <Modal
+        size="xl"
+        opened={opened}
+        onClose={close}
+        title={
+          <Text fw={600} fz="xl">
+            Medicines
+          </Text>
+        }
+        centered
+      >
+        <div className="grid grid-cols-2 gap-5">
+          {medicinesData?.map((medicine: any, index: number) => (
+            <Card key={index} shadow="sm" padding="lg" radius="md" withBorder>
+              <Title order={4} mb="sm" className="capitalize">
+                {medicine.name} ({medicine.type})
+              </Title>
+              {/* <Text fw={600} fz="lg" mb="sm">
+              {medicine.name} ({medicine.type})
+            </Text> */}
+              <Divider mb="md" />
+
+              <Grid>
+                <Grid.Col span={6}>
+                  <Text size="sm" fw={500}>
+                    Medicine ID:
+                  </Text>
+                  <Text c="dimmed">{medicine.medicineId ?? 'N/A'}</Text>
+                </Grid.Col>
+                <Grid.Col span={6}>
+                  <Text size="sm" fw={500}>
+                    Prescription ID:
+                  </Text>
+                  <Text c="dimmed">{medicine.prescriptionId}</Text>
+                </Grid.Col>
+                <Grid.Col span={6}>
+                  <Text size="sm" fw={500}>
+                    Dosage:
+                  </Text>
+                  <Text c="dimmed">{medicine.dosage}</Text>
+                </Grid.Col>
+
+                <Grid.Col span={6}>
+                  <Text size="sm" fw={500}>
+                    Frequency:
+                  </Text>
+                  <Text c="dimmed">{medicine.frequency}</Text>
+                </Grid.Col>
+                <Grid.Col span={6}>
+                  <Text size="sm" fw={500}>
+                    Duration:
+                  </Text>
+                  <Text c="dimmed">{medicine.duration} days</Text>
+                </Grid.Col>
+
+                <Grid.Col span={6}>
+                  <Text size="sm" fw={500}>
+                    Route:
+                  </Text>
+                  <Text c="dimmed">{medicine.route}</Text>
+                </Grid.Col>
+
+                <Grid.Col span={12}>
+                  <Text size="sm" fw={500}>
+                    Instructions:
+                  </Text>
+                  <Text c="dimmed">{medicine.instructions}</Text>
+                </Grid.Col>
+              </Grid>
+            </Card>
+          ))}
+        </div>
+        {medicinesData.length === 0 && (
+          <Text c="dimmed" size="sm" mt="md">
+            No medicines prescribed for this appointment.
+          </Text>
+        )}
+      </Modal>
     </div>
   );
 };
