@@ -109,20 +109,46 @@ const tests = [
 ];
 
 const dosageFrequencies = [
-  "1-0-0",  // Once daily in the morning
-  "0-1-0",  // Once daily in the afternoon
-  "0-0-1",  // Once daily at night
-  "1-0-1",  // Morning & night
-  "1-1-0",  // Morning & afternoon
-  "0-1-1",  // Afternoon & night
-  "1-1-1",  // Morning, afternoon, night (thrice daily)
-  "2-0-2",  // Two tablets morning & night
-  "1-0-2",  // Morning & two at night
-  "2-2-2"   // High-frequency dosing
-]
+  '1-0-0', // Once daily in the morning
+  '0-1-0', // Once daily in the afternoon
+  '0-0-1', // Once daily at night
+  '1-0-1', // Morning & night
+  '1-1-0', // Morning & afternoon
+  '0-1-1', // Afternoon & night
+  '1-1-1', // Morning, afternoon, night (thrice daily)
+  '2-0-2', // Two tablets morning & night
+  '1-0-2', // Morning & two at night
+  '2-2-2', // High-frequency dosing
+];
 
+const medicineCategories = [
+  { label: 'Analgesic', value: 'ANALGESIC' },
+  { label: 'Antibiotic', value: 'ANTIBIOTIC' },
+  { label: 'Antiviral', value: 'ANTIVIRAL' },
+  { label: 'Antifungal', value: 'ANTIFUNGAL' },
+  { label: 'Antipyretic', value: 'ANTIPYRETIC' },
+  { label: 'Antihistamine', value: 'ANTIHISTAMINE' },
+  { label: 'Antidiabetic', value: 'ANTIDIABETIC' },
+  { label: 'Cardiovascular', value: 'CARDIOVASCULAR' },
+  { label: 'Gastrointestinal', value: 'GASTROINTESTINAL' },
+  { label: 'Respiratory', value: 'RESPIRATORY' },
+  { label: 'Vitamin', value: 'VITAMIN' },
+  { label: 'Vaccine', value: 'VACCINE' },
+  { label: 'Other', value: 'OTHER' },
+];
 
-
+const medicineTypes = [
+  { label: 'Tablet', value: 'TABLET' },
+  { label: 'Capsule', value: 'CAPSULE' },
+  { label: 'Syrup', value: 'SYRUP' },
+  { label: 'Injection', value: 'INJECTION' },
+  { label: 'Drops', value: 'DROPS' },
+  { label: 'Ointment', value: 'OINTMENT' },
+  { label: 'Cream', value: 'CREAM' },
+  { label: 'Spray', value: 'SPRAY' },
+  { label: 'Inhaler', value: 'INHALER' },
+  { label: 'Powder', value: 'POWDER' },
+];
 
 export {
   bloodGroups,
@@ -132,5 +158,7 @@ export {
   appointmentReasons,
   symptoms,
   tests,
-  dosageFrequencies
+  dosageFrequencies,
+  medicineCategories,
+  medicineTypes,
 };
