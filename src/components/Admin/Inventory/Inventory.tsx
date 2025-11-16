@@ -1,45 +1,39 @@
 import {
   ActionIcon,
+  Badge,
   Button,
   Fieldset,
+  Group,
   NumberInput,
   Select,
   TextInput,
+  type SelectProps,
 } from '@mantine/core';
+import { DateInput } from '@mantine/dates';
 import { useForm } from '@mantine/form';
-import { IconEdit, IconSearch } from '@tabler/icons-react';
+import { IconCheck, IconEdit, IconSearch } from '@tabler/icons-react';
 import { FilterMatchMode } from 'primereact/api';
 import { Column } from 'primereact/column';
 import { DataTable, type DataTableFilterMeta } from 'primereact/datatable';
 import { useEffect, useState } from 'react';
 import {
-  addMedicine,
-  getAllMedicine,
-  updateMedicine,
-} from '../../../Service/MedicineService';
+  addStock,
+  getAllStocks,
+  updateStock,
+} from '../../../Service/InventoryService';
+import { getAllMedicine } from '../../../Service/MedicineService';
 import { formatDate } from '../../../Utility/DateUtility';
 import {
   errorNotification,
   successNotification,
 } from '../../../Utility/NotificationUtil';
 import { capitalizeFirstLetter } from '../../../Utility/OtherUtility';
-import { medicineCategories, medicineTypes } from '../../Data/DropdownData';
 
-type Medicine = {
-  name: string;
-  medicineId?: number;
-  dosage: string;
-  frequency: string;
-  duration: number;
-  route: string;
-  type: string;
-  instructions: string;
-  prescriptionId?: number;
-};
-
-const Medicine = () => {
+const Inventory = () => {
   const [loading, setLoading] = useState(false);
   const [data, setData] = useState<any[]>([]);
+  const [medicine, setMedicine] = useState<any[]>([]);
+  const [medicineMap, setMedicineMap] = useState<Record<string, any>>({});
 
   const [edit, setEdit] = useState<boolean>(false);
 
@@ -60,37 +54,48 @@ const Medicine = () => {
   };
 
   useEffect(() => {
+    getAllMedicine()
+      .then((response) => {
+        console.log('All Medicines Data:', response);
+        setMedicine(response);
+        setMedicineMap(
+          response.reduce((acc: any, item: any) => {
+            acc[item.id] = item;
+            return acc;
+          }, {})
+        );
+      })
+      .catch((err) => {
+        console.error('Error fetching Medicines:', err);
+      });
     fetchData();
   }, []);
 
   const fetchData = () => {
-    getAllMedicine()
+    getAllStocks()
       .then((response) => {
-        console.log('All Medicines Data:', response);
+        console.log('All Stocks Data:', response);
         setData(response);
       })
       .catch((err) => {
-        console.error('Error fetching Medicines:', err);
+        console.error('Error fetching Stocks:', err);
       });
   };
 
   const form = useForm({
     initialValues: {
       id: null,
-      name: '',
-      dosage: '',
-      category: '',
-      type: '',
-      manufacturer: '',
-      unitPrice: '',
+      medicineId: '',
+      batchNo: '',
+      quantity: '',
+      expiryDate: null,
     },
+
     validate: {
-      name: (value) => (value ? null : 'Medicine name is required'),
-      dosage: (value) => (value ? null : 'Dosage is required'),
-      category: (value) => (value ? null : 'Category is required'),
-      type: (value) => (value ? null : 'Type is required'),
-      manufacturer: (value) => (value ? null : 'Manufacturer is required'),
-      unitPrice: (value) => (value ? null : 'Unit Price is required'),
+      medicineId: (value) => (value ? null : 'Medicine is required'),
+      batchNo: (value) => (value ? null : 'Batch number is required'),
+      quantity: (value) => (value ? null : 'Quantity is required'),
+      expiryDate: (value) => (value ? null : 'Expiry date is required'),
     },
   });
 
@@ -103,12 +108,10 @@ const Medicine = () => {
     setEdit(true);
     form.setValues({
       ...rowData,
-      name: rowData.name,
-      dosage: rowData.dosage,
-      category: rowData.category,
-      type: rowData.type,
-      manufacturer: rowData.manufacturer,
-      unitPrice: rowData.unitPrice,
+      medicineId: rowData.medicineId ? String(rowData.medicineId) : '',
+      batchNo: rowData.batchNo,
+      quantity: rowData.quantity,
+      expiryDate: new Date(rowData.expiryDate),
     });
   };
 
@@ -117,17 +120,15 @@ const Medicine = () => {
     let method;
     if (values.id) {
       update = true;
-      method = updateMedicine;
+      method = updateStock;
     } else {
-      method = addMedicine;
+      method = addStock;
     }
 
     setLoading(true);
     try {
       const res = await method(values);
-      successNotification(
-        `Medicine ${update ? 'updated' : 'added'} successfully`
-      );
+      successNotification(`Stock ${update ? 'updated' : 'added'} successfully`);
       form.reset();
       setEdit(false);
       fetchData();
@@ -135,7 +136,7 @@ const Medicine = () => {
       console.error('Error creating report:', err);
       errorNotification(
         err?.response?.data?.errorMessage ||
-          `Failed to ${update ? 'update' : 'add'} medicine`
+          `Failed to ${update ? 'update' : 'add'} stock`
       );
     } finally {
       setLoading(false);
@@ -156,7 +157,7 @@ const Medicine = () => {
     return (
       <div className="flex flex-wrap gap-2 justify-between items-center">
         <Button variant="filled" onClick={() => setEdit(true)}>
-          Add Medicine
+          Add Stock
         </Button>
 
         <TextInput
@@ -167,6 +168,38 @@ const Medicine = () => {
           placeholder="Keyword Search"
         />
       </div>
+    );
+  };
+
+  const renderSelectOption: SelectProps['renderOption'] = ({
+    option,
+    checked,
+  }: any) => (
+    <Group flex="1" gap="xs">
+      <div className="flex gap-2 items-center">
+        {option.label}
+        {option?.manufacturer && (
+          <span
+            style={{
+              marginLeft: 'auto',
+              fontSize: '0.8rem',
+              color: 'gray',
+            }}
+          >
+            {option.manufacturer}
+          </span>
+        )}
+      </div>
+      {checked && <IconCheck style={{ marginInlineStart: 'auto' }} />}
+    </Group>
+  );
+
+  const statusBody = (rowData: any) => {
+    const isExpired = new Date(rowData.expiryDate) < new Date();
+    return (
+      <Badge color={isExpired ? 'red' : 'green'}>
+        {isExpired ? 'Expired' : 'Active'}
+      </Badge>
     );
   };
 
@@ -190,28 +223,31 @@ const Medicine = () => {
           emptyMessage="No appointment found."
           currentPageReportTemplate="Showing {first} to {last} of {totalRecords} entries"
         >
-          <Column field="name" header="Name" />
-          <Column field="dosage" header="Dosage" />
-          <Column field="stock" header="Stock" />
           <Column
-            field="category"
-            header="Category"
-            body={(rowData) => capitalizeFirstLetter(rowData.category)}
-          />
-          <Column
-            field="type"
-            header="Type"
-            body={(rowData) => capitalizeFirstLetter(rowData.type)}
-          />
-          <Column field="manufacturer" header="Manufacturer" />
-          <Column field="unitPrice" header="Unit Price (₹)" sortable />
+            field="name"
+            header="Medicine"
+            body={(rowData) => (
+              <div className="flex flex-col">
+                <span className="font-medium">
+                  {medicineMap['' + rowData.medicineId]?.name}
+                </span>
 
-          <Column
-            field="createdAt"
-            header="Creater Date"
-            sortable
-            body={(rowData) => formatDate(rowData.createdAt)}
+                <span className="text-xs text-gray-600">
+                  {medicineMap['' + rowData.medicineId]?.manufacturer}
+                </span>
+              </div>
+            )}
           />
+          <Column field="batchNo" header="Batch No." />
+          <Column field="initialQuantity" header="Quantity" />
+          <Column field="quantity" header="Remaining Quantity" />
+          <Column
+            field="expiryDate"
+            header="Expiry Date"
+            sortable
+            body={(rowData) => formatDate(rowData.expiryDate)}
+          />
+          <Column field="status" header="Status" body={statusBody} />
 
           <Column
             headerStyle={{ textAlign: 'center' }}
@@ -230,40 +266,37 @@ const Medicine = () => {
             }
             radius="md"
           >
-            <TextInput
-              {...form.getInputProps('name')}
-              withAsterisk
+            <Select
+              {...form.getInputProps('medicineId')}
               label="Medicine"
-              placeholder="Enter medicine name"
+              placeholder="Select medicine"
+              data={medicine.map((item) => ({
+                ...item,
+                value: '' + item.id,
+                label: item.name,
+              }))}
+              renderOption={renderSelectOption}
+              withAsterisk
             />
+
             <TextInput
-              {...form.getInputProps('dosage')}
-              label="Dosage"
-              placeholder="Enter dosage 50mg, 100mg, etc."
-            />
-            <Select
-              {...form.getInputProps('category')}
-              label="Category"
-              placeholder="Select category"
-              data={medicineCategories}
-            />
-            <Select
-              {...form.getInputProps('type')}
-              label="Type"
-              placeholder="Select type"
-              data={medicineTypes}
-            />
-            <TextInput
-              {...form.getInputProps('manufacturer')}
-              label="Manufacturer"
-              placeholder="Enter manufacturer"
+              {...form.getInputProps('batchNo')}
+              withAsterisk
+              label="Batch No."
+              placeholder="Enter batch number"
             />
             <NumberInput
               min={0}
               clampBehavior="strict"
-              {...form.getInputProps('unitPrice')}
-              label="Unit Price"
-              placeholder="Enter unit price"
+              {...form.getInputProps('quantity')}
+              label="Quantity"
+              placeholder="Enter quantity"
+            />
+            <DateInput
+              {...form.getInputProps('expiryDate')}
+              minDate={new Date()}
+              label="Expiry Date"
+              placeholder="Select expiry date"
             />
           </Fieldset>
           <div className="flex items-center gap-5 justify-center">
@@ -274,7 +307,7 @@ const Medicine = () => {
               variant="filled"
               color="primary"
             >
-              {form.values?.id ? 'Update Medicine' : 'Add Medicine'}
+              {form.values?.id ? 'Update Stock' : 'Add Stock'}
             </Button>
             <Button
               loading={loading}
@@ -291,4 +324,4 @@ const Medicine = () => {
   );
 };
 
-export default Medicine;
+export default Inventory;

@@ -15,6 +15,7 @@ import DoctorAppointmentPage from '../pages/Doctor/DoctorAppointmentPage';
 import DoctorAppointmentDetailsPage from '../pages/Doctor/DoctorAppointmentDetailsPage';
 import AdminMedicinePage from '../pages/Admin/AdminMedicinePage';
 import NotFoundPage from '../pages/NotFoundPage';
+import AdminInventoryPage from '../pages/Admin/AdminInventoryPage';
 
 const AppRoutes = () => {
   return (
@@ -46,7 +47,7 @@ const AppRoutes = () => {
         >
           <Route path="dashboard" element={<Random />} />
           <Route path="medicine" element={<AdminMedicinePage />} />
-          <Route path="inventory" element={<Random />} />
+          <Route path="inventory" element={<AdminInventoryPage />} />
           <Route path="sales" element={<Random />} />
           <Route path="patients" element={<Random />} />
           <Route path="doctors" element={<Random />} />
