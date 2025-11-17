@@ -11,11 +11,17 @@ import {
 } from '@mantine/core';
 import { DateInput } from '@mantine/dates';
 import { useForm } from '@mantine/form';
-import { IconCheck, IconEdit, IconSearch } from '@tabler/icons-react';
+import {
+  IconCheck,
+  IconEdit,
+  IconPlus,
+  IconSearch,
+  IconTrash,
+} from '@tabler/icons-react';
 import { FilterMatchMode } from 'primereact/api';
 import { Column } from 'primereact/column';
 import { DataTable, type DataTableFilterMeta } from 'primereact/datatable';
-import { useEffect, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import {
   addStock,
   getAllStocks,
@@ -27,8 +33,14 @@ import {
   errorNotification,
   successNotification,
 } from '../../../Utility/NotificationUtil';
+import { addSales } from '../../../Service/SalesService';
 
-const Inventory = () => {
+interface SaleItem {
+  medicineId: string;
+  quantity: number;
+}
+
+const Sales = () => {
   const [loading, setLoading] = useState(false);
   const [data, setData] = useState<any[]>([]);
   const [medicine, setMedicine] = useState<any[]>([]);
@@ -83,18 +95,19 @@ const Inventory = () => {
 
   const form = useForm({
     initialValues: {
-      id: null,
-      medicineId: '',
-      batchNo: '',
-      quantity: '',
-      expiryDate: null,
+      saleItems: [
+        {
+          medicineId: '',
+          quantity: 0,
+        },
+      ] as SaleItem[],
     },
-
     validate: {
-      medicineId: (value) => (value ? null : 'Medicine is required'),
-      batchNo: (value) => (value ? null : 'Batch number is required'),
-      quantity: (value) => (value ? null : 'Quantity is required'),
-      expiryDate: (value) => (value ? null : 'Expiry date is required'),
+      saleItems: {
+        medicineId: (value) => (value ? null : 'Medicine is required'),
+        quantity: (value) =>
+          value > 0 ? null : 'Quantity must be greater than 0',
+      },
     },
   });
 
@@ -115,27 +128,17 @@ const Inventory = () => {
   };
 
   const handleSubmit = async (values: any) => {
-    let update = false;
-    let method;
-    if (values.id) {
-      update = true;
-      method = updateStock;
-    } else {
-      method = addStock;
-    }
-
     setLoading(true);
     try {
-      const res = await method(values);
-      successNotification(`Stock ${update ? 'updated' : 'added'} successfully`);
+      const res = await addSales(values);
+      successNotification(`Sales added successfully`);
       form.reset();
       setEdit(false);
       fetchData();
     } catch (err: any) {
       console.error('Error creating report:', err);
       errorNotification(
-        err?.response?.data?.errorMessage ||
-          `Failed to ${update ? 'update' : 'add'} stock`
+        err?.response?.data?.errorMessage || `Failed to add sales`
       );
     } finally {
       setLoading(false);
@@ -156,7 +159,7 @@ const Inventory = () => {
     return (
       <div className="flex flex-wrap gap-2 justify-between items-center">
         <Button variant="filled" onClick={() => setEdit(true)}>
-          Add Stock
+          Sell Medicine
         </Button>
 
         <TextInput
@@ -200,6 +203,10 @@ const Inventory = () => {
         {isExpired ? 'Expired' : 'Active'}
       </Badge>
     );
+  };
+
+  const addMore = () => {
+    form.insertListItem('saleItems', { medicineId: '', quantity: 0 });
   };
 
   const header = renderHeader();
@@ -257,7 +264,7 @@ const Inventory = () => {
       ) : (
         <form onSubmit={form.onSubmit(handleSubmit)} className="grid gap-5">
           <Fieldset
-            className="grid grid-cols-2 gap-4"
+            className="grid gap-5"
             legend={
               <span className="text-lg font-medium text-primary-500">
                 Medicine information
@@ -265,39 +272,69 @@ const Inventory = () => {
             }
             radius="md"
           >
-            <Select
-              {...form.getInputProps('medicineId')}
-              label="Medicine"
-              placeholder="Select medicine"
-              data={medicine.map((item) => ({
-                ...item,
-                value: '' + item.id,
-                label: item.name,
-              }))}
-              renderOption={renderSelectOption}
-              withAsterisk
-            />
+            <div className="grid grid-cols-5 gap-4">
+              {form.values.saleItems.map((item, index) => (
+                <React.Fragment key={index}>
+                  <div className="col-span-2">
+                    <Select
+                      {...form.getInputProps(`saleItems.${index}.medicineId`)}
+                      label="Medicine"
+                      placeholder="Select medicine"
+                      data={medicine.map((item) => ({
+                        ...item,
+                        value: '' + item.id,
+                        label: item.name,
+                      }))}
+                      renderOption={renderSelectOption}
+                      withAsterisk
+                    />
+                  </div>
 
-            <TextInput
-              {...form.getInputProps('batchNo')}
-              withAsterisk
-              label="Batch No."
-              placeholder="Enter batch number"
-            />
-            <NumberInput
-              min={0}
-              clampBehavior="strict"
-              {...form.getInputProps('quantity')}
-              label="Quantity"
-              placeholder="Enter quantity"
-            />
-            <DateInput
-              {...form.getInputProps('expiryDate')}
-              minDate={new Date()}
-              label="Expiry Date"
-              placeholder="Select expiry date"
-            />
+                  <div className="col-span-2">
+                    <NumberInput
+                      min={0}
+                      max={50}
+                      clampBehavior="strict"
+                      {...form.getInputProps(`saleItems.${index}.quantity`)}
+                      label="Quantity"
+                      placeholder="Enter quantity"
+                    />
+                  </div>
+                  <div className="flex items-end justify-between">
+                    {item.quantity && item.medicineId ? (
+                      <div>
+                        Total {item.quantity} X{' '}
+                        {medicineMap[item.medicineId]?.unitPrice} ={' '}
+                        {item.quantity *
+                          medicineMap[item.medicineId]?.unitPrice}
+                      </div>
+                    ) : (
+                      <div></div>
+                    )}
+                    <ActionIcon
+                      type="button"
+                      size="lg"
+                      color="red"
+                      onClick={() => form.removeListItem('saleItems', index)}
+                    >
+                      <IconTrash size={20} />
+                    </ActionIcon>
+                  </div>
+                </React.Fragment>
+              ))}
+            </div>
+            <div className="flex items-center justify-center">
+              <Button
+                type="button"
+                onClick={addMore}
+                variant="outline"
+                leftSection={<IconPlus size={16} />}
+              >
+                Add more
+              </Button>
+            </div>
           </Fieldset>
+
           <div className="flex items-center gap-5 justify-center">
             <Button
               loading={loading}
@@ -306,7 +343,7 @@ const Inventory = () => {
               variant="filled"
               color="primary"
             >
-              {form.values?.id ? 'Update Stock' : 'Add Stock'}
+              Sell Medicine
             </Button>
             <Button
               loading={loading}
@@ -323,4 +360,4 @@ const Inventory = () => {
   );
 };
 
-export default Inventory;
+export default Sales;
