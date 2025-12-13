@@ -4,6 +4,8 @@ import {
   Button,
   Fieldset,
   Group,
+  Loader,
+  LoadingOverlay,
   NumberInput,
   Select,
   TextInput,
@@ -129,16 +131,30 @@ const Sales = () => {
 
   const handleSubmit = async (values: any) => {
     setLoading(true);
+
+    const saleItems = values.saleItems.map((x: any) => ({
+      ...x,
+      unitPrice: medicineMap[x.medicineId]?.unitPrice,
+    }));
+
+    const totalAmount = saleItems.reduce(
+      (acc: number, item: any) => acc + item.quantity * item.unitPrice,
+      0
+    );
+
     try {
-      const res = await addSales(values);
-      successNotification(`Sales added successfully`);
+      const res = await addSales({
+        saleItems,
+        totalAmount,
+      });
+      successNotification(`Medicines sold successfully`);
       form.reset();
       setEdit(false);
       fetchData();
     } catch (err: any) {
       console.error('Error creating report:', err);
       errorNotification(
-        err?.response?.data?.errorMessage || `Failed to add sales`
+        err?.response?.data?.errorMessage || `Failed to sold Medicines`
       );
     } finally {
       setLoading(false);
@@ -188,7 +204,7 @@ const Sales = () => {
               color: 'gray',
             }}
           >
-            {option.manufacturer}
+            {option.manufacturer} - {option.dosage}
           </span>
         )}
       </div>
@@ -263,6 +279,7 @@ const Sales = () => {
         </DataTable>
       ) : (
         <form onSubmit={form.onSubmit(handleSubmit)} className="grid gap-5">
+          <LoadingOverlay visible={loading} />
           <Fieldset
             className="grid gap-5"
             legend={
@@ -280,11 +297,19 @@ const Sales = () => {
                       {...form.getInputProps(`saleItems.${index}.medicineId`)}
                       label="Medicine"
                       placeholder="Select medicine"
-                      data={medicine.map((item) => ({
-                        ...item,
-                        value: '' + item.id,
-                        label: item.name,
-                      }))}
+                      data={medicine
+                        .filter(
+                          (x) =>
+                            !form.values.saleItems.some(
+                              (item1, idx) =>
+                                item1.medicineId == x.id && idx != index
+                            )
+                        )
+                        .map((item) => ({
+                          ...item,
+                          value: '' + item.id,
+                          label: item.name,
+                        }))}
                       renderOption={renderSelectOption}
                       withAsterisk
                     />
@@ -292,8 +317,14 @@ const Sales = () => {
 
                   <div className="col-span-2">
                     <NumberInput
+                      rightSectionWidth={80}
+                      rightSection={
+                        <div className="text-xs flex gap-1 text-white font-medium rounded-md bg-red-400 p-1">
+                          Stock: {medicineMap[item.medicineId]?.stock}
+                        </div>
+                      }
                       min={0}
-                      max={50}
+                      max={medicineMap[item.medicineId]?.stock || 0}
                       clampBehavior="strict"
                       {...form.getInputProps(`saleItems.${index}.quantity`)}
                       label="Quantity"
