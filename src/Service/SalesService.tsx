@@ -27,7 +27,6 @@ const getAllSaleItems = async (id: number) => {
     });
 };
 
-
 const updateSales = async (data: any) => {
   return axiosInstance
     .put('pharmacy/sales/update', data)
@@ -37,4 +36,13 @@ const updateSales = async (data: any) => {
     });
 };
 
-export { addSales, getSales, getAllSaleItems, updateSales };
+const getAllSales = async () => {
+  return axiosInstance
+    .get('pharmacy/sales/getAll')
+    .then((response: any) => response.data)
+    .catch((error: any) => {
+      throw error;
+    });
+};
+
+export { addSales, getSales, getAllSaleItems, updateSales, getAllSales };

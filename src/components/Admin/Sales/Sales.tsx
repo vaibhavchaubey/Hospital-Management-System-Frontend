@@ -2,20 +2,25 @@ import {
   ActionIcon,
   Badge,
   Button,
+  Card,
+  Divider,
   Fieldset,
+  Grid,
   Group,
-  Loader,
   LoadingOverlay,
+  Modal,
   NumberInput,
   Select,
+  Text,
   TextInput,
+  Title,
   type SelectProps,
 } from '@mantine/core';
-import { DateInput } from '@mantine/dates';
 import { useForm } from '@mantine/form';
+import { useDisclosure } from '@mantine/hooks';
 import {
   IconCheck,
-  IconEdit,
+  IconEye,
   IconPlus,
   IconSearch,
   IconTrash,
@@ -24,18 +29,17 @@ import { FilterMatchMode } from 'primereact/api';
 import { Column } from 'primereact/column';
 import { DataTable, type DataTableFilterMeta } from 'primereact/datatable';
 import React, { useEffect, useState } from 'react';
-import {
-  addStock,
-  getAllStocks,
-  updateStock,
-} from '../../../Service/InventoryService';
 import { getAllMedicine } from '../../../Service/MedicineService';
+import {
+  addSales,
+  getAllSaleItems,
+  getAllSales,
+} from '../../../Service/SalesService';
 import { formatDate } from '../../../Utility/DateUtility';
 import {
   errorNotification,
   successNotification,
 } from '../../../Utility/NotificationUtil';
-import { addSales } from '../../../Service/SalesService';
 
 interface SaleItem {
   medicineId: string;
@@ -47,6 +51,10 @@ const Sales = () => {
   const [data, setData] = useState<any[]>([]);
   const [medicine, setMedicine] = useState<any[]>([]);
   const [medicineMap, setMedicineMap] = useState<Record<string, any>>({});
+
+  const [opened, { open, close }] = useDisclosure(false);
+
+  const [saleItems, setSaleItems] = useState<any[]>([]);
 
   const [edit, setEdit] = useState<boolean>(false);
 
@@ -85,18 +93,20 @@ const Sales = () => {
   }, []);
 
   const fetchData = () => {
-    getAllStocks()
+    getAllSales()
       .then((response) => {
-        console.log('All Stocks Data:', response);
+        console.log('All Sales Data:', response);
         setData(response);
       })
       .catch((err) => {
-        console.error('Error fetching Stocks:', err);
+        console.error('Error fetching Sales:', err);
       });
   };
 
   const form = useForm({
     initialValues: {
+      buyerName: '',
+      buyerContact: '',
       saleItems: [
         {
           medicineId: '',
@@ -129,6 +139,22 @@ const Sales = () => {
     });
   };
 
+  const handleDetails = (rowData: any) => {
+    open();
+    setLoading(true);
+    getAllSaleItems(rowData.id)
+      .then((response) => {
+        console.log('Sale Items Data:', response);
+        setSaleItems(response);
+      })
+      .catch((err) => {
+        console.error('Error fetching Sale Items:', err);
+      })
+      .finally(() => {
+        setLoading(false);
+      });
+  };
+
   const handleSubmit = async (values: any) => {
     setLoading(true);
 
@@ -144,6 +170,7 @@ const Sales = () => {
 
     try {
       const res = await addSales({
+        ...values,
         saleItems,
         totalAmount,
       });
@@ -164,8 +191,8 @@ const Sales = () => {
   const actionBodyTemplate = (rowData: any) => {
     return (
       <div className="flex gap-2">
-        <ActionIcon onClick={() => onEdit(rowData)}>
-          <IconEdit size={20} stroke={1.5} />
+        <ActionIcon onClick={() => handleDetails(rowData)}>
+          <IconEye size={20} stroke={1.5} />
         </ActionIcon>
       </div>
     );
@@ -232,6 +259,7 @@ const Sales = () => {
       {!edit ? (
         <DataTable
           header={header}
+          removableSort
           stripedRows
           value={data}
           size="small"
@@ -242,34 +270,19 @@ const Sales = () => {
           dataKey="id"
           filterDisplay="menu"
           globalFilterFields={['doctorName', 'notes']}
-          emptyMessage="No appointment found."
+          emptyMessage="No sales found."
           currentPageReportTemplate="Showing {first} to {last} of {totalRecords} entries"
         >
+          <Column field="buyerName" header="Buyer" />
+          <Column field="buyerContact" header="Contact" />
+          {/* <Column field="prescriptionId" header="PrescriptionId" /> */}
+          <Column field="totalAmount" header="Total Amount" sortable />
           <Column
-            field="name"
-            header="Medicine"
-            body={(rowData) => (
-              <div className="flex flex-col">
-                <span className="font-medium">
-                  {medicineMap['' + rowData.medicineId]?.name}
-                </span>
-
-                <span className="text-xs text-gray-600">
-                  {medicineMap['' + rowData.medicineId]?.manufacturer}
-                </span>
-              </div>
-            )}
-          />
-          <Column field="batchNo" header="Batch No." />
-          <Column field="initialQuantity" header="Quantity" />
-          <Column field="quantity" header="Remaining Quantity" />
-          <Column
-            field="expiryDate"
-            header="Expiry Date"
+            field="saleDate"
+            header="Sale Date"
             sortable
-            body={(rowData) => formatDate(rowData.expiryDate)}
+            body={(rowData) => formatDate(rowData.saleDate)}
           />
-          <Column field="status" header="Status" body={statusBody} />
 
           <Column
             headerStyle={{ textAlign: 'center' }}
@@ -280,6 +293,31 @@ const Sales = () => {
       ) : (
         <form onSubmit={form.onSubmit(handleSubmit)} className="grid gap-5">
           <LoadingOverlay visible={loading} />
+          <Fieldset
+            className="grid gap-5"
+            legend={
+              <span className="text-lg font-medium text-primary-500">
+                Buyer Information
+              </span>
+            }
+            radius="md"
+          >
+            <div className="grid grid-cols-2 gap-5">
+              <TextInput
+                label="Buyer Name"
+                placeholder="Enter buyer name"
+                {...form.getInputProps('buyerName')}
+                withAsterisk
+              />
+              <NumberInput
+                maxLength={10}
+                label="Contact Number"
+                placeholder="Enter contact number"
+                {...form.getInputProps('buyerContact')}
+                withAsterisk
+              />
+            </div>
+          </Fieldset>
           <Fieldset
             className="grid gap-5"
             legend={
@@ -387,6 +425,66 @@ const Sales = () => {
           </div>
         </form>
       )}
+
+      <Modal
+        size="xl"
+        opened={opened}
+        onClose={close}
+        title={
+          <Text fw={600} fz="xl">
+            Sold Medicines
+          </Text>
+        }
+        centered
+      >
+        <div className="grid grid-cols-2 gap-5">
+          {saleItems?.map((saleItem: any, index: number) => (
+            <Card key={index} shadow="sm" padding="lg" radius="md" withBorder>
+              <Title order={4} mb="sm" className="capitalize">
+                {medicineMap[saleItem.medicineId]?.name} -{' '}
+                {medicineMap[saleItem.medicineId]?.dosage}{' '}
+                <span className="text-gray-600">
+                  ({medicineMap[saleItem.medicineId]?.manufacturer})
+                </span>
+              </Title>
+
+              <Text size="xs" c="dimmed">
+                {saleItem.batchNo}
+              </Text>
+
+              <Divider my="sm" />
+
+              <Grid>
+                <Grid.Col span={4}>
+                  <Text size="sm" fw={500}>
+                    Quantity:
+                  </Text>
+                  <Text c="dimmed">{saleItem.quantity}</Text>
+                </Grid.Col>
+                <Grid.Col span={4}>
+                  <Text size="sm" fw={500}>
+                    Unit Price:
+                  </Text>
+                  <Text c="dimmed">{saleItem.unitPrice}</Text>
+                </Grid.Col>
+                <Grid.Col span={4}>
+                  <Text size="sm" fw={500}>
+                    Total:
+                  </Text>
+                  <Text c="dimmed">
+                    ₹ {saleItem.quantity * saleItem.unitPrice}
+                  </Text>
+                </Grid.Col>
+              </Grid>
+            </Card>
+          ))}
+        </div>
+        {saleItems.length === 0 && (
+          <Text c="dimmed" size="sm" mt="md">
+            No medicines sold in this sale.
+          </Text>
+        )}
+      </Modal>
     </div>
   );
 };
