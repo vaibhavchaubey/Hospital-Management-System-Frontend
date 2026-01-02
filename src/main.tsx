@@ -10,7 +10,7 @@ import App from './App.tsx';
 import '@mantine/core/styles.css';
 import '@mantine/notifications/styles.css';
 import '@mantine/dates/styles.css';
-
+import '@mantine/spotlight/styles.css';
 import { MantineProvider, createTheme } from '@mantine/core';
 import { ModalsProvider } from '@mantine/modals';
 import { Notifications } from '@mantine/notifications';

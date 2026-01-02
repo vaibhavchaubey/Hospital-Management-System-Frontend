@@ -2,51 +2,57 @@ import {
   ActionIcon,
   Button,
   Fieldset,
+  Group,
   MultiSelect,
   NumberInput,
   Select,
   Textarea,
   TextInput,
+  type SelectProps,
 } from '@mantine/core';
 import { useForm } from '@mantine/form';
-import { IconSearch, IconTrash } from '@tabler/icons-react';
+import { IconCheck, IconSearch, IconTrash } from '@tabler/icons-react';
 import { FilterMatchMode } from 'primereact/api';
 import { Column } from 'primereact/column';
 import { DataTable, type DataTableFilterMeta } from 'primereact/datatable';
 import { useEffect, useState } from 'react';
-import { useDispatch } from 'react-redux';
-import { useNavigate } from 'react-router-dom';
 import {
   createAppointmentReport,
   getReportsByPatientId,
   isReportExists,
 } from '../../../Service/AppointmentService';
+import { getAllMedicine } from '../../../Service/MedicineService';
 import { formatDate } from '../../../Utility/DateUtility';
 import {
   errorNotification,
   successNotification,
 } from '../../../Utility/NotificationUtil';
-import { dosageFrequencies, symptoms, tests } from '../../Data/DropdownData';
+import {
+  dosageFrequencies,
+  medicineTypes,
+  symptoms,
+  tests,
+} from '../../Data/DropdownData';
 
 type Medicine = {
   name: string;
-  medicineId?: number;
+  medicineId?: string | number | undefined;
   dosage: string;
   frequency: string;
   duration: number;
-  route: string;
+  // route: string;
   type: string;
   instructions: string;
   prescriptionId?: number;
 };
 
 const AppointmentReport = ({ appointment }: any) => {
-  const dispatch = useDispatch();
-  const navigate = useNavigate();
   const [loading, setLoading] = useState(false);
   const [data, setData] = useState<any[]>([]);
   const [allowAdd, setAllowAdd] = useState<boolean>(false);
   const [edit, setEdit] = useState<boolean>(false);
+  const [medicine, setMedicine] = useState<any[]>([]);
+  const [medicineMap, setMedicineMap] = useState<Record<string, any>>({});
 
   const [filters, setFilters] = useState<DataTableFilterMeta>({
     global: { value: null, matchMode: FilterMatchMode.CONTAINS },
@@ -112,7 +118,7 @@ const AppointmentReport = ({ appointment }: any) => {
             value.trim() ? null : 'Frequency is required',
           duration: (value: number) =>
             value > 0 ? null : 'Duration should be greater than 0',
-          route: (value: string) => (value.trim() ? null : 'Route is required'),
+          // route: (value: string) => (value.trim() ? null : 'Route is required'),
           type: (value: string) => (value.trim() ? null : 'Type is required'),
           instructions: (value: string) =>
             value.trim() ? null : 'Instructions are required',
@@ -120,6 +126,23 @@ const AppointmentReport = ({ appointment }: any) => {
       },
     },
   });
+
+  useEffect(() => {
+    getAllMedicine()
+      .then((response) => {
+        console.log('All Medicines Data:', response);
+        setMedicine(response);
+        setMedicineMap(
+          response.reduce((acc: any, item: any) => {
+            acc[item.id] = item;
+            return acc;
+          }, {})
+        );
+      })
+      .catch((err) => {
+        console.error('Error fetching Medicines:', err);
+      });
+  }, []);
 
   const insertMeidicne = () => {
     form.insertListItem('prescription.medicines', {
@@ -144,7 +167,10 @@ const AppointmentReport = ({ appointment }: any) => {
       patientId: appointment.patientId,
       appointmentId: appointment.id,
       prescription: {
-        ...values.prescription,
+        medicines: values.prescription.medicines.map((med) => ({
+          ...med,
+          medicineId: med.medicineId === 'OTHER' ? null : med.medicineId,
+        })),
         doctorId: appointment.doctorId,
         patientId: appointment.patientId,
         appointmentId: appointment.id,
@@ -201,6 +227,52 @@ const AppointmentReport = ({ appointment }: any) => {
         />
       </div>
     );
+  };
+
+  const renderSelectOption: SelectProps['renderOption'] = ({
+    option,
+    checked,
+  }: any) => (
+    <Group flex="1" gap="xs">
+      <div className="flex gap-2 items-center">
+        {option.label}
+        {option?.manufacturer && (
+          <span
+            style={{
+              marginLeft: 'auto',
+              fontSize: '0.8rem',
+              color: 'gray',
+            }}
+          >
+            {option.manufacturer} - {option.dosage}
+          </span>
+        )}
+      </div>
+      {checked && <IconCheck style={{ marginInlineStart: 'auto' }} />}
+    </Group>
+  );
+
+  const handleChangeMed = (medId: any, index: number) => {
+    if (medId && medId !== 'OTHER') {
+      form.setFieldValue(`prescription.medicines.${index}.medicineId`, medId);
+      form.setFieldValue(
+        `prescription.medicines.${index}.name`,
+        medicineMap[medId]?.name || ''
+      );
+      form.setFieldValue(
+        `prescription.medicines.${index}.dosage`,
+        medicineMap[medId]?.dosage || ''
+      );
+      form.setFieldValue(
+        `prescription.medicines.${index}.type`,
+        medicineMap[medId]?.type || ''
+      );
+    } else {
+      form.setFieldValue(`prescription.medicines.${index}.medicineId`, 'OTHER');
+      form.setFieldValue(`prescription.medicines.${index}.name`, null);
+      form.setFieldValue(`prescription.medicines.${index}.dosage`, null);
+      form.setFieldValue(`prescription.medicines.${index}.type`, null);
+    }
   };
 
   const header = renderHeader();
@@ -299,7 +371,7 @@ const AppointmentReport = ({ appointment }: any) => {
             radius="md"
           >
             {form.values.prescription.medicines.map(
-              (_medicine: Medicine, index: number) => (
+              (med: Medicine, index: number) => (
                 <Fieldset
                   legend={
                     <div className="flex items-center gap-5">
@@ -319,16 +391,49 @@ const AppointmentReport = ({ appointment }: any) => {
                   }
                   className="grid gap-4 col-span-2 grid-cols-2"
                 >
-                  <TextInput
+                  <Select
                     {...form.getInputProps(
-                      `prescription.medicines.${index}.name`
+                      `prescription.medicines.${index}.medicineId`
                     )}
-                    withAsterisk
                     label="Medicine"
-                    placeholder="Enter medicine name"
+                    placeholder="Select medicine"
+                    onChange={(value: any) => handleChangeMed(value, index)}
+                    data={[
+                      ...medicine
+                        .filter(
+                          (x: any) =>
+                            !form.values.prescription.medicines.some(
+                              (item1, idx) =>
+                                item1.medicineId == x.id && idx != index
+                            )
+                        )
+                        .map((item) => ({
+                          ...item,
+                          value: '' + item.id,
+                          label: item.name,
+                        })),
+                      {
+                        value: 'OTHER',
+                        label: 'Other',
+                      },
+                    ]}
+                    renderOption={renderSelectOption}
+                    withAsterisk
                   />
 
+                  {med.medicineId == 'OTHER' && (
+                    <TextInput
+                      {...form.getInputProps(
+                        `prescription.medicines.${index}.name`
+                      )}
+                      withAsterisk
+                      label="Medicine"
+                      placeholder="Enter medicine name"
+                    />
+                  )}
+
                   <TextInput
+                    disabled={med.medicineId != 'OTHER'}
                     {...form.getInputProps(
                       `prescription.medicines.${index}.dosage`
                     )}
@@ -355,7 +460,7 @@ const AppointmentReport = ({ appointment }: any) => {
                     placeholder="Enter duration in days"
                   />
 
-                  <Select
+                  {/* <Select
                     {...form.getInputProps(
                       `prescription.medicines.${index}.route`
                     )}
@@ -369,22 +474,17 @@ const AppointmentReport = ({ appointment }: any) => {
                       'Inhalation',
                       'Injection',
                     ]}
-                  />
+                  /> */}
 
                   <Select
+                    disabled={med.medicineId != 'OTHER'}
                     {...form.getInputProps(
                       `prescription.medicines.${index}.type`
                     )}
                     withAsterisk
                     label="Type"
                     placeholder="Select type"
-                    data={[
-                      'Tablet',
-                      'Capsule',
-                      'Syrup',
-                      'Injection',
-                      'Ointment',
-                    ]}
+                    data={medicineTypes}
                   />
 
                   <TextInput

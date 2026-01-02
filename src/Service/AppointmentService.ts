@@ -91,6 +91,24 @@ const getPrescriptionsByPatientId = async (patientId: number) => {
     });
 };
 
+const getAllPrescriptions = async () => {
+  return axiosInstance
+    .get('/appointment/report/getAllPrescriptions')
+    .then((response: any) => response.data)
+    .catch((error: any) => {
+      throw error;
+    });
+};
+
+const getMedicinesByPrescriptionId = async (prescriptionId: any) => {
+  return axiosInstance
+    .get('/appointment/report/getMedicinesByPrescriptionId/' + prescriptionId)
+    .then((response: any) => response.data)
+    .catch((error: any) => {
+      throw error;
+    });
+};
+
 export {
   cancelAppointment,
   getAppointment,
@@ -102,4 +120,6 @@ export {
   isReportExists,
   getReportsByPatientId,
   getPrescriptionsByPatientId,
+  getAllPrescriptions, 
+  getMedicinesByPrescriptionId
 };
