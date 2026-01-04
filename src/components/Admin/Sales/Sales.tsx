@@ -16,7 +16,7 @@ import {
   Title,
   type SelectProps,
 } from '@mantine/core';
-import { Spotlight, SpotlightActionData, spotlight } from '@mantine/spotlight';
+import { Spotlight, SpotlightAction, spotlight } from '@mantine/spotlight';
 import { IconSearch } from '@tabler/icons-react';
 
 import { useForm } from '@mantine/form';
@@ -41,6 +41,7 @@ import {
   errorNotification,
   successNotification,
 } from '../../../Utility/NotificationUtil';
+import { freqMap } from '../../Data/DropdownData';
 
 interface SaleItem {
   medicineId: string;
@@ -59,7 +60,7 @@ const Sales = () => {
 
   const [edit, setEdit] = useState<boolean>(false);
 
-  const [actions, setActions] = useState<SpotlightActionData[]>([]);
+  const [actions, setActions] = useState<SpotlightAction[]>([]);
 
   const [filters, setFilters] = useState<DataTableFilterMeta>({
     global: { value: null, matchMode: FilterMatchMode.CONTAINS },
@@ -177,6 +178,18 @@ const Sales = () => {
 
   const handleSubmit = async (values: any) => {
     setLoading(true);
+    let flag = false;
+    values.saleItems.forEach((item: any, index:number) => {
+      if (item.quantity > (medicineMap[item.medicineId]?.stock || 0)) {
+        flag = true;
+        form.setFieldError(`saleItems.${index}.quantity`, 'Quantity exceeds available stock');
+      }
+    });
+
+    if (flag) {
+      errorNotification(`Quantity for some medicines exceed available stock`);
+      return;
+    }
 
     const saleItems = values.saleItems.map((x: any) => ({
       ...x,
@@ -286,12 +299,26 @@ const Sales = () => {
     spotlight.open();
   };
 
+  const calculateQuantity = (freq: string, duration: number) => {
+    const freqValue = freqMap[freq] || 0;
+    return Math.ceil(freqValue * duration);
+  };
+
   const handleImport = (prescription: any) => {
     setLoading(true);
     getMedicinesByPrescriptionId(prescription.id)
       .then((response) => {
         console.log('Medicines by Prescription Id:', response);
         // setSaleItems(response);
+        form.setValues({
+          buyerName: prescription.patientName,
+          saleItems: response
+            .filter((item: any) => item.medicineId != null)
+            .map((item: any) => ({
+              medicineId: String(item.medicineId),
+              quantity: calculateQuantity(item.frequency, item.duration),
+            })),
+        });
       })
       .catch((err) => {
         console.error('Error fetching Medicines by Prescription Id:', err);
@@ -423,7 +450,7 @@ const Sales = () => {
                             Stock: {medicineMap[item.medicineId]?.stock}
                           </div>
                         }
-                        min={0}
+                        min={1}
                         max={medicineMap[item.medicineId]?.stock || 0}
                         clampBehavior="strict"
                         {...form.getInputProps(`saleItems.${index}.quantity`)}

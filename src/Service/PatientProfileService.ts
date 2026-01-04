@@ -19,4 +19,13 @@ const updatePatient = async (patient: Partial<PatientProfile>) => {
     });
 };
 
-export { getPatient, updatePatient };
+const getAllPatients = async () => {
+  return axiosInstance
+    .get('profile/patient/getAll')
+    .then((response: any) => response.data)
+    .catch((error: any) => {
+      throw error;
+    });
+};
+
+export { getPatient, updatePatient, getAllPatients };

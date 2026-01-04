@@ -27,4 +27,13 @@ const getDoctorDropdowns = async () => {
     });
 };
 
-export { getDoctor, updateDoctor, getDoctorDropdowns };
+const getAllDoctors = async () => {
+  return axiosInstance
+    .get('profile/doctor/getAll')
+    .then((response: any) => response.data)
+    .catch((error: any) => {
+      throw error;
+    });
+};
+
+export { getDoctor, updateDoctor, getDoctorDropdowns, getAllDoctors };

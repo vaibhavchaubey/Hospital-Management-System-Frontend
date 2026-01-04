@@ -20,6 +20,8 @@ const bloodGroup: Record<string, string> = {
   O_NEGATIVE: 'O-',
 };
 
+const bloodGroupMap = bloodGroup;
+
 const doctorSpecializations = [
   'Cardiology',
   'Dermatology',
@@ -116,10 +118,25 @@ const dosageFrequencies = [
   '1-1-0', // Morning & afternoon
   '0-1-1', // Afternoon & night
   '1-1-1', // Morning, afternoon, night (thrice daily)
-  '2-0-2', // Two tablets morning & night
-  '1-0-2', // Morning & two at night
-  '2-2-2', // High-frequency dosing
+  '0-0-0',
+  '1-0-0.5',
+  '1-0-0 (SOS)', // morning if needed
+  '1-0-1 (Alt Day)', // Alternate days
 ];
+
+const freqMap: Record<string, number> = {
+  '1-0-0': 1,
+  '0-1-0': 1,
+  '0-0-1': 1,
+  '1-0-1': 2,
+  '1-1-0': 2,
+  '0-1-1': 2,
+  '1-1-1': 3,
+  '0-0-0': 1,
+  '1-0-0.5': 1.5,
+  '1-0-0 (SOS)': 0.5,
+  '1-0-1 (Alt Day)': 1,
+};
 
 const medicineCategories = [
   { label: 'Analgesic', value: 'ANALGESIC' },
@@ -161,4 +178,6 @@ export {
   dosageFrequencies,
   medicineCategories,
   medicineTypes,
+  freqMap,
+  bloodGroupMap,
 };
