@@ -26,6 +26,7 @@ import {
 } from '../../../Utility/NotificationUtil';
 import { formatDate } from '../../../Utility/DateUtility';
 import useProtectedImage from '../../Utility/Dropzone/useProtectedImage';
+import DropzoneButton from '../../Utility/Dropzone/DropzoneButton';
 
 const doctor = {
   dob: '1985-04-15',
@@ -316,7 +317,7 @@ const Profile = () => {
           <span className="text-xl font-medium">Upload Profile Picture</span>
         }
       >
-        {/* Modal content */}
+        <DropzoneButton close={close} form={form} id="profilePictureId" />
       </Modal>
     </div>
   );
