@@ -19,4 +19,13 @@ const loginUser = async (user: LoginUserInput) => {
     });
 };
 
-export { registerUser, loginUser };
+const getUserProfile = async (id: number) => {
+  return axiosInstance
+    .get('user/getProfile/' + id)
+    .then((response: any) => response.data)
+    .catch((error: any) => {
+      throw error;
+    });
+};
+
+export { registerUser, loginUser, getUserProfile };

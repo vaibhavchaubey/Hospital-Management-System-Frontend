@@ -28,6 +28,7 @@ import {
 import { arrayToCSV } from '../../../Utility/OtherUtility';
 import { bloodGroup, bloodGroups } from '../../Data/DropdownData';
 import DropzoneButton from '../../Utility/Dropzone/DropzoneButton';
+import useProtectedImage from '../../Utility/Dropzone/useProtectedImage';
 
 const Profile = () => {
   const user: User = useSelector((state: any) => state.user);
@@ -61,6 +62,7 @@ const Profile = () => {
       dob: '',
       phone: '',
       address: '',
+      profilePictureId: '',
       aadharNo: '',
       bloodGroup: '',
       allergies: [],
@@ -124,17 +126,14 @@ const Profile = () => {
     }
   };
 
+  const url = useProtectedImage(profile.profilePictureId);
+
   return (
     <div className="p-10">
       <div className="flex justify-between items-center">
         <div className="flex gap-5 items-center">
           <div className="flex flex-col items-center gap-3">
-            <Avatar
-              variant="filled"
-              src="/avatar.png"
-              size={150}
-              alt="it's me"
-            />
+            <Avatar variant="filled" src={url} size={150} alt="it's me" />
 
             {editMode && (
               <Button
@@ -316,7 +315,7 @@ const Profile = () => {
           <span className="text-xl font-medium">Upload Profile Picture</span>
         }
       >
-        <DropzoneButton />
+        <DropzoneButton close={close} form={form} id="profilePictureId" />
       </Modal>
     </div>
   );

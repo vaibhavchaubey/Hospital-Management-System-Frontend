@@ -9,9 +9,28 @@ import {
 } from '@tabler/icons-react';
 import { useSelector } from 'react-redux';
 import type { User } from '../../types';
+import { useEffect, useState } from 'react';
+import { getUserProfile } from '../../Service/UserService';
+import useProtectedImage from '../Utility/Dropzone/useProtectedImage';
 
 const ProfileMenu = () => {
   const user: User = useSelector((state: any) => state.user);
+  const [profilePictureId, setProfilePictureId] = useState<string | null>(null);
+
+  useEffect(() => {
+    if (!user) {
+      return;
+    }
+    getUserProfile(user.id)
+      .then((profilePictureId: any) => {
+        setProfilePictureId(profilePictureId);
+      })
+      .catch((error) => {
+        console.error('Error fetching user profile:', error);
+      });
+  }, []);
+
+  const url = useProtectedImage(profilePictureId);
 
   return (
     <Menu shadow="md" width={200}>
@@ -20,7 +39,7 @@ const ProfileMenu = () => {
           <span className="font-medium text-lg text-neutral-900">
             {user.name}
           </span>
-          <Avatar variant="filled" src="/avatar.png" size={45} alt="it's me" />
+          <Avatar variant="filled" src={url} size={45} alt="it's me" />
         </div>
       </Menu.Target>
 

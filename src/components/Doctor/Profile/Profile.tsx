@@ -25,6 +25,7 @@ import {
   successNotification,
 } from '../../../Utility/NotificationUtil';
 import { formatDate } from '../../../Utility/DateUtility';
+import useProtectedImage from '../../Utility/Dropzone/useProtectedImage';
 
 const doctor = {
   dob: '1985-04-15',
@@ -63,6 +64,7 @@ const Profile = () => {
       dob: '',
       phone: '',
       address: '',
+      profilePictureId: '',
       licenseNo: '',
       specialization: '',
       department: '',
@@ -117,17 +119,14 @@ const Profile = () => {
     }
   };
 
+  const url = useProtectedImage(profile.profilePictureId);
+
   return (
     <div className="p-10">
       <div className="flex justify-between items-center">
         <div className="flex gap-5 items-center">
           <div className="flex flex-col items-center gap-3">
-            <Avatar
-              variant="filled"
-              src="/avatar.png"
-              size={150}
-              alt="it's me"
-            />
+            <Avatar variant="filled" src={url} size={150} alt="it's me" />
 
             {editMode && (
               <Button

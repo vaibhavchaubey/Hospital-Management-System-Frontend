@@ -4,13 +4,15 @@ import {
   IconHeartbeat,
   IconLayoutGrid,
   IconMoodHeart,
-  IconStethoscope,
   IconUser,
-  IconVaccine,
+  IconVaccine
 } from '@tabler/icons-react';
+import { useEffect, useState } from 'react';
 import { useSelector } from 'react-redux';
 import { NavLink } from 'react-router-dom';
+import { getUserProfile } from '../../../Service/UserService';
 import type { User } from '../../../types';
+import useProtectedImage from '../../Utility/Dropzone/useProtectedImage';
 
 const links = [
   {
@@ -42,6 +44,22 @@ const links = [
 
 const Sidebar = () => {
   const user: User = useSelector((state: any) => state.user);
+  const [profilePictureId, setProfilePictureId] = useState<string | null>(null);
+  
+    useEffect(() => {
+      if (!user) {
+        return;
+      }
+      getUserProfile(user.id)
+        .then((profilePictureId: any) => {
+          setProfilePictureId(profilePictureId);
+        })
+        .catch((error) => {
+          console.error('Error fetching user profile:', error);
+        });
+    }, []);
+  
+    const url = useProtectedImage(profilePictureId);
 
   return (
     <div className="flex">
@@ -60,7 +78,7 @@ const Sidebar = () => {
             <div className="p-1 bg-white rounded-full shadow-lg">
               <Avatar
                 variant="filled"
-                src="/avatar.png"
+                src={url}
                 size="xl"
                 alt="it's me"
               />
