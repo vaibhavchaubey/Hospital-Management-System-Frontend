@@ -27,6 +27,7 @@ import {
 } from '../../../Utility/NotificationUtil';
 import { arrayToCSV } from '../../../Utility/OtherUtility';
 import { bloodGroup, bloodGroups } from '../../Data/DropdownData';
+import DropzoneButton from '../../Utility/Dropzone/DropzoneButton';
 
 const Profile = () => {
   const user: User = useSelector((state: any) => state.user);
@@ -315,7 +316,7 @@ const Profile = () => {
           <span className="text-xl font-medium">Upload Profile Picture</span>
         }
       >
-        {/* Modal content */}
+        <DropzoneButton />
       </Modal>
     </div>
   );
