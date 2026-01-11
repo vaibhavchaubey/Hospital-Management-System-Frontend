@@ -49,6 +49,10 @@ const AdminDoctorsPage = React.lazy(
   () => import('../pages/Admin/AdminDoctorsPage')
 );
 
+const AdminDashboardPage = React.lazy(
+  () => import('../pages/Admin/AdminDashboardPage')
+);
+
 const AppRoutes = () => {
   return (
     <BrowserRouter>
@@ -78,7 +82,7 @@ const AppRoutes = () => {
               </ProtectedRoute>
             }
           >
-            <Route path="dashboard" element={<Random />} />
+            <Route path="dashboard" element={<AdminDashboardPage />} />
             <Route path="medicine" element={<AdminMedicinePage />} />
             <Route path="inventory" element={<AdminInventoryPage />} />
             <Route path="sales" element={<AdminSalesPage />} />
