@@ -1,13 +1,13 @@
 import { ScrollArea } from '@mantine/core';
-import {
-    appointments
-} from '../../Data/DashboardData';
+import { appointments } from '../../Data/DashboardData';
 
 const Appointments = () => {
-  
   const card = (app: any) => {
     return (
-      <div className="p-3 mb-3 rounded-xl justify-between border-l-4 border-violet-500 shadow-md flex bg-violet-100" key={app.id}>
+      <div
+        className="p-3 mb-3 rounded-xl justify-between border-l-4 border-violet-500 shadow-md flex bg-violet-100"
+        key={app.id}
+      >
         <div>
           <div className="font-semibold">{app.patient}</div>
           <div className="text-sm text-gray-500">{app.doctor}</div>
