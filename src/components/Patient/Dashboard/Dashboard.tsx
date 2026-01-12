@@ -1,4 +1,6 @@
+import Appointments from './Appointments';
 import DiseaseChart from './DiseaseChart';
+import Medications from './Medications';
 import Visits from './Visits';
 import Welcome from './Welcome';
 
@@ -11,6 +13,8 @@ const Dashboard = () => {
       </div>
       <div className="grid grid-cols-3 gap-5">
         <DiseaseChart />
+        <Appointments />
+        <Medications />
       </div>
     </div>
   );

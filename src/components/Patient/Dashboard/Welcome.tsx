@@ -33,18 +33,18 @@ const Welcome = () => {
           <div className="text-3xl font-semibold text-blue-600">
             {user?.name}!
           </div>
-          <div className="text-sm">Surgery, Cardiology</div>
+          <div className="text-sm">A+, india</div>
         </div>
         <Avatar variant="filled" src={url} size={100} alt="it's me" />
       </div>
       <div className="flex gap-5">
         <div className="p-3 rounded-xl bg-violet-200">
-          <div className="text-sm">Appointments</div>
-          <div className="text-lg font-semibold text-violet-600">120+</div>
+          <div className="text-sm">Visits</div>
+          <div className="text-lg font-semibold text-violet-600">10+</div>
         </div>
         <div className="p-3 rounded-xl bg-orange-200">
-          <div className="text-sm">Patients</div>
-          <div className="text-lg font-semibold text-orange-600">80+</div>
+          <div className="text-sm">Medications</div>
+          <div className="text-lg font-semibold text-orange-600">35+</div>
         </div>
       </div>
     </div>
