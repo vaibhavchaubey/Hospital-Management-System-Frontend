@@ -57,6 +57,10 @@ const DoctorDashboardPage = React.lazy(
   () => import('../pages/Doctor/DoctorDashboardPage')
 );
 
+const PatientDashboardPage = React.lazy(
+  () => import('../pages/Patient/PatientDashboardPage')
+);
+
 const AppRoutes = () => {
   return (
     <BrowserRouter>
@@ -121,7 +125,7 @@ const AppRoutes = () => {
               </ProtectedRoute>
             }
           >
-            <Route path="dashboard" element={<Random />} />
+            <Route path="dashboard" element={<PatientDashboardPage />} />
             <Route path="profile" element={<PatientProfilePage />} />
             <Route path="appointments" element={<PatientAppointmentPage />} />
           </Route>

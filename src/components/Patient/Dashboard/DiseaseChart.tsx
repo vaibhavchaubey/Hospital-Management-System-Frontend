@@ -4,7 +4,7 @@ import { diseaseData } from '../../Data/DashboardData';
 const DiseaseChart = () => {
   return (
     <div className="p-3 border rounded-xl bg-green-50 shadow-xl flex flex-col gap-3">
-      <div className="text-xl font-semibold">Reason for Appointments</div>
+      <div className="text-xl font-semibold">Reason for Visits</div>
       <div className="flex justify-center">
         <DonutChart
           thickness={25}

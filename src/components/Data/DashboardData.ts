@@ -1,4 +1,3 @@
-
 const appointmentsData = [
   { date: 'Jan 2025', appointments: 20 },
   { date: 'Feb 2025', appointments: 25 },
@@ -47,14 +46,10 @@ const patientsData = [
 const diseaseData = [
   { name: 'Diabetes', value: 420, color: 'indigo.6' },
   { name: 'Heart Disease', value: 310, color: 'red.6' },
-  { name: 'Cancer', value: 260, color: 'violet.6' },
   { name: 'Asthma', value: 190, color: 'teal.6' },
   { name: 'Covid-19', value: 220, color: 'orange.6' },
   { name: 'Hypertension', value: 340, color: 'blue.6' },
-  { name: 'Arthritis', value: 175, color: 'green.6' },
   { name: 'Migraine', value: 210, color: 'pink.6' },
-  { name: 'Tuberculosis', value: 160, color: 'yellow.6' },
-  { name: 'Dengue', value: 230, color: 'cyan.6' },
 ];
 
 const medicines = [
@@ -192,6 +187,10 @@ const appointments = [
 export {
   appointments,
   appointmentsData,
-  diseaseData, doctors, doctorsData, medicines, patients, patientsData
+  diseaseData,
+  doctors,
+  doctorsData,
+  medicines,
+  patients,
+  patientsData,
 };
-
