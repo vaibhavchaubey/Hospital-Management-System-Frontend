@@ -5,15 +5,16 @@ const Appointments = () => {
   const card = (app: any) => {
     return (
       <div
-        className="p-3 mb-3 rounded-xl justify-between border-l-4 border-violet-500 shadow-md flex bg-violet-100 items-center"
+        className="p-3 mb-3 rounded-xl justify-between border-l-4 border-violet-500 shadow-md flex bg-violet-100"
         key={app.id}
       >
         <div>
           <div className="font-semibold">{app.patient}</div>
-          <div className="text-sm text-gray-500">{app.reason}</div>
+          <div className="text-sm text-gray-500">{app.doctor}</div>
         </div>
         <div className="text-right">
           <div className="text-sm text-gray-500">{app.time}</div>
+          <div className="text-sm text-gray-500">{app.reason}</div>
         </div>
       </div>
     );
