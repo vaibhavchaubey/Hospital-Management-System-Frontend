@@ -5,13 +5,39 @@ import {
   IconStethoscope,
   IconUsers,
 } from '@tabler/icons-react';
-import {
-  appointmentsData,
-  doctorsData,
-  patientsData,
-} from '../../Data/DashboardData';
+import { useEffect, useState } from 'react';
+import { countAllAppointments } from '../../../Service/AppointmentService';
+import { addZeroMonths } from '../../../Utility/OtherUtility';
+import { getRegistrationCounts } from '../../../Service/UserService';
 
 const TopCards = () => {
+  const [appointmentData, setAppointmentData] = useState<any[]>([]);
+  const [patientData, setPatientData] = useState<any[]>([]);
+  const [doctorData, setDoctorData] = useState<any[]>([]);
+
+  useEffect(() => {
+    countAllAppointments()
+      .then((data) => {
+        console.log('Appointments Data:', data);
+        setAppointmentData(addZeroMonths(data, 'month', 'count'));
+      })
+      .catch((error) => {
+        console.error('Error fetching appointment data:', error);
+      });
+
+    getRegistrationCounts()
+      .then((data) => {
+        console.log('Registration Counts Data:', data);
+        console.log('Registration Counts Patient Data:', data.patientCounts);
+        console.log('Registration Counts Doctor Data:', data.doctorCounts);
+        setPatientData(addZeroMonths(data.patientCounts, 'month', 'count'));
+        setDoctorData(addZeroMonths(data.doctorCounts, 'month', 'count'));
+      })
+      .catch((error) => {
+        console.error('Error fetching registration counts:', error);
+      });
+  }, []);
+
   const getSum = (data: any[], key: string) => {
     return data.reduce((sum, item) => sum + item[key], 0);
   };
@@ -21,7 +47,7 @@ const TopCards = () => {
     color: string,
     bg: string,
     icon: React.ReactNode,
-    data: any[]
+    data: any[],
   ) => {
     return (
       <div className={`${bg} rounded-xl`}>
@@ -37,7 +63,7 @@ const TopCards = () => {
         <AreaChart
           h={100}
           data={data}
-          dataKey="date"
+          dataKey="month"
           series={[{ name: id, color: color }]}
           strokeWidth={5}
           withGradient
@@ -56,27 +82,27 @@ const TopCards = () => {
   const cards = [
     {
       name: 'Appointments',
-      id: 'appointments',
+      id: 'count',
       color: 'violet',
       bg: 'bg-violet-100',
       icon: <IconFileReport />,
-      data: appointmentsData,
+      data: appointmentData,
     },
     {
       name: 'Patients',
-      id: 'patients',
+      id: 'count',
       color: 'orange',
       bg: 'bg-orange-100',
       icon: <IconUsers />,
-      data: patientsData,
+      data: patientData,
     },
     {
       name: 'Doctors',
-      id: 'doctors',
+      id: 'count',
       color: 'green',
       bg: 'bg-green-100',
       icon: <IconStethoscope />,
-      data: doctorsData,
+      data: doctorData,
     },
   ];
 
@@ -89,8 +115,8 @@ const TopCards = () => {
           cardItem.color,
           cardItem.bg,
           cardItem.icon,
-          cardItem.data
-        )
+          cardItem.data,
+        ),
       )}
     </div>
   );

@@ -109,17 +109,97 @@ const getMedicinesByPrescriptionId = async (prescriptionId: any) => {
     });
 };
 
+const countAppointmentsByPatient = async (patientId: number) => {
+  return axiosInstance
+    .get('/appointment/countByPatient/' + patientId)
+    .then((response: any) => response.data)
+    .catch((error: any) => {
+      throw error;
+    });
+};
+
+const countAppointmentsByDoctor = async (doctorId: number) => {
+  return axiosInstance
+    .get('/appointment/countByDoctor/' + doctorId)
+    .then((response: any) => response.data)
+    .catch((error: any) => {
+      throw error;
+    });
+};
+
+const countAllAppointments = async () => {
+  return axiosInstance
+    .get('/appointment/visitCount')
+    .then((response: any) => response.data)
+    .catch((error: any) => {
+      throw error;
+    });
+};
+
+const countReasonsByPatient = async (patientId: number) => {
+  return axiosInstance
+    .get('/appointment/countReasonsByPatient/' + patientId)
+    .then((response: any) => response.data)
+    .catch((error: any) => {
+      throw error;
+    });
+};
+
+const countReasonsByDoctor = async (doctorId: number) => {
+  return axiosInstance
+    .get('/appointment/countReasonsByDoctor/' + doctorId)
+    .then((response: any) => response.data)
+    .catch((error: any) => {
+      throw error;
+    });
+};
+
+const countAllReasons = async () => {
+  return axiosInstance
+    .get('/appointment/countReasons')
+    .then((response: any) => response.data)
+    .catch((error: any) => {
+      throw error;
+    });
+};
+
+const getMedicinesConsumedByPatient = async (patientId: number) => {
+  return axiosInstance
+    .get('/appointment/getMedicinesByPatient/' + patientId)
+    .then((response: any) => response.data)
+    .catch((error: any) => {
+      throw error;
+    });
+};
+
+const getTodaysAppointments = async () => {
+  return axiosInstance
+    .get('/appointment/today')
+    .then((response: any) => response.data)
+    .catch((error: any) => {
+      throw error;
+    });
+};
+
 export {
   cancelAppointment,
+  countAllAppointments,
+  countAllReasons,
+  countAppointmentsByDoctor,
+  countAppointmentsByPatient,
+  countReasonsByDoctor,
+  countReasonsByPatient,
+  createAppointmentReport,
+  getAllPrescriptions,
   getAppointment,
   getAppointmentDetails,
-  scheduleAppointment,
-  getAppointmentsByPatient,
   getAppointmentsByDoctor,
-  createAppointmentReport,
-  isReportExists,
-  getReportsByPatientId,
+  getAppointmentsByPatient,
+  getMedicinesByPrescriptionId,
+  getMedicinesConsumedByPatient,
   getPrescriptionsByPatientId,
-  getAllPrescriptions, 
-  getMedicinesByPrescriptionId
+  getReportsByPatientId,
+  getTodaysAppointments,
+  isReportExists,
+  scheduleAppointment,
 };
