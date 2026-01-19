@@ -1,20 +1,24 @@
 import { AreaChart } from '@mantine/charts';
+import { useEffect, useState } from 'react';
+import { countAppointmentsByPatient } from '../../../Service/AppointmentService';
+import { addZeroMonths } from '../../../Utility/OtherUtility';
+import { useSelector } from 'react-redux';
+import type { User } from '../../../types';
 
 const Visits = () => {
-  const data = [
-    { date: 'January', visits: 10 },
-    { date: 'February', visits: 15 },
-    { date: 'March', visits: 12 },
-    { date: 'April', visits: 10 },
-    { date: 'May', visits: 20 },
-    { date: 'June', visits: 9 },
-    { date: 'July', visits: 22 },
-    { date: 'August', visits: 14 },
-    { date: 'September', visits: 18 },
-    { date: 'October', visits: 16 },
-    { date: 'November', visits: 12 },
-    { date: 'December', visits: 10 },
-  ];
+  const user: User = useSelector((state: any) => state.user);
+
+  const [appointments, setAppointments] = useState<any[]>([]);
+
+  useEffect(() => {
+    countAppointmentsByPatient(user.profileId)
+      .then((data) => {
+        setAppointments(addZeroMonths(data, 'month', 'count'));
+      })
+      .catch((error) => {
+        console.error('Error fetching appointments:', error);
+      });
+  }, []);
 
   const getSum = (data: any[], key: string) => {
     return data.reduce((sum, item) => sum + item[key], 0);
@@ -30,15 +34,15 @@ const Visits = () => {
           </div>
         </div>
         <div className="text-2xl font-bold text-violet-500">
-          {getSum(data, 'visits')}
+          {getSum(appointments, 'count')}
         </div>
       </div>
 
       <AreaChart
         h={150}
-        data={data}
-        dataKey="date"
-        series={[{ name: 'visits', color: 'violet' }]}
+        data={appointments}
+        dataKey="month"
+        series={[{ name: 'count', color: 'violet' }]}
         strokeWidth={5}
         withGradient
         fillOpacity={0.7}

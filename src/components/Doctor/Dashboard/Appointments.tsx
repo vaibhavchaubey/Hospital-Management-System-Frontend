@@ -1,7 +1,22 @@
 import { ScrollArea } from '@mantine/core';
-import { appointments } from '../../Data/DashboardData';
+import { useEffect, useState } from 'react';
+import { getTodaysAppointments } from '../../../Service/AppointmentService';
+import { extractTimeIn12HourFormat } from '../../../Utility/DateUtility';
 
 const Appointments = () => {
+  const [todayAppointment, setTodayAppointment] = useState<any[]>([]);
+
+  useEffect(() => {
+    getTodaysAppointments()
+      .then((res: any) => {
+        console.log('Today Appointments Data:', res);
+        setTodayAppointment(res);
+      })
+      .catch((error: any) => {
+        console.error('Error fetching today appointments:', error);
+      });
+  }, []);
+
   const card = (app: any) => {
     return (
       <div
@@ -9,11 +24,13 @@ const Appointments = () => {
         key={app.id}
       >
         <div>
-          <div className="font-semibold">{app.patient}</div>
+          <div className="font-semibold">{app.patientName}</div>
           <div className="text-sm text-gray-500">{app.reason}</div>
         </div>
         <div className="text-right">
-          <div className="text-sm text-gray-500">{app.time}</div>
+          <div className="text-sm text-gray-500">
+            {extractTimeIn12HourFormat(app.appointmentTime)}
+          </div>
         </div>
       </div>
     );
@@ -24,7 +41,7 @@ const Appointments = () => {
       <div className="text-xl font-semibold">Today's Appointments</div>
       <div>
         <ScrollArea.Autosize mah={300} mx="auto">
-          {appointments.map((app) => card(app))}
+          {todayAppointment.map((app) => card(app))}
         </ScrollArea.Autosize>
       </div>
     </div>

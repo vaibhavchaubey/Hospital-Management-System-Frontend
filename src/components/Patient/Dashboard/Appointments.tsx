@@ -1,7 +1,28 @@
 import { ScrollArea } from '@mantine/core';
-import { appointments } from '../../Data/DashboardData';
+import { useEffect, useState } from 'react';
+import { useSelector } from 'react-redux';
+import { getAppointmentsByPatient } from '../../../Service/AppointmentService';
+import type { User } from '../../../types';
+import {
+  extractTimeIn12HourFormat,
+  formatDate,
+} from '../../../Utility/DateUtility';
 
 const Appointments = () => {
+  const user: User = useSelector((state: any) => state.user);
+
+  const [appointments, setAppointments] = useState<any[]>([]);
+
+  useEffect(() => {
+    getAppointmentsByPatient(user.profileId)
+      .then((data) => {
+        setAppointments(data);
+      })
+      .catch((error) => {
+        console.error('Error fetching appointments:', error);
+      });
+  }, []);
+
   const card = (app: any) => {
     return (
       <div
@@ -9,12 +30,17 @@ const Appointments = () => {
         key={app.id}
       >
         <div>
-          <div className="font-semibold">{app.doctor}</div>
+          <div className="font-semibold">{app.doctorName}</div>
           <div className="text-sm text-gray-500">{app.reason}</div>
         </div>
         <div className="text-right">
-          <div className="text-sm text-gray-500">6 October 2025</div>
-          <div className="text-sm text-gray-500">{app.time}</div>
+          <div className="text-sm text-gray-500">
+            {formatDate(app.appointmentTime)}
+          </div>
+          <div className="text-sm text-gray-500">
+            {' '}
+            {extractTimeIn12HourFormat(app.appointmentTime)}
+          </div>
         </div>
       </div>
     );

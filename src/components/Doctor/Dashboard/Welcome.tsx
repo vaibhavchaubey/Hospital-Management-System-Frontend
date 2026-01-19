@@ -4,11 +4,14 @@ import { Avatar } from '@mantine/core';
 import { useEffect, useState } from 'react';
 import { getUserProfile } from '../../../Service/UserService';
 import useProtectedImage from '../../Utility/Dropzone/useProtectedImage';
+import { getDoctor } from '../../../Service/DoctorProfileService';
 
 const Welcome = () => {
   const user: User = useSelector((state: any) => state.user);
 
   const [profilePictureId, setProfilePictureId] = useState<string | null>(null);
+
+  const [doctorInfo, setDoctorInfo] = useState<any>({});
 
   useEffect(() => {
     if (!user) {
@@ -20,6 +23,14 @@ const Welcome = () => {
       })
       .catch((error) => {
         console.error('Error fetching user profile:', error);
+      });
+
+    getDoctor(user.profileId)
+      .then((data: any) => {
+        setDoctorInfo(data);
+      })
+      .catch((error) => {
+        console.error('Error fetching doctor Info:', error);
       });
   }, []);
 
@@ -33,7 +44,9 @@ const Welcome = () => {
           <div className="text-3xl font-semibold text-blue-600">
             {user?.name}!
           </div>
-          <div className="text-sm">Surgery, Cardiology</div>
+          <div className="text-sm">
+            {doctorInfo.specialization}, {doctorInfo.department}
+          </div>
         </div>
         <Avatar variant="filled" src={url} size={100} alt="it's me" />
       </div>
