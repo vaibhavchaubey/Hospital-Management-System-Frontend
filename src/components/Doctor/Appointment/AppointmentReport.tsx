@@ -305,7 +305,7 @@ const AppointmentReport = ({ appointment }: any) => {
       {!edit ? (
         <div>
           <Toolbar
-            className="mb-4"
+            className="mb-4 !p-1"
             start={startToolbarTemplate}
             end={rightToolbarTemplate}
           ></Toolbar>
