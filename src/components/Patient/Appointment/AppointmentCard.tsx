@@ -1,18 +1,12 @@
-import { Avatar, Divider } from '@mantine/core';
 import {
-  IconCalendarHeart,
   IconClock,
   IconEmergencyBed,
-  IconMail,
-  IconMapPin,
   IconNote,
-  IconPhone,
   IconProgress,
   IconUserHeart,
 } from '@tabler/icons-react';
-import { bloodGroupMap } from '../../Data/DropdownData';
-import { formatDateWithTime } from '../../../Utility/DateUtility';
 import { Tag } from 'primereact/tag';
+import { formatDateWithTime } from '../../../Utility/DateUtility';
 
 const AppointmentCard = ({
   id,
