@@ -20,7 +20,14 @@ import { DateTimePicker } from '@mantine/dates';
 import { useForm } from '@mantine/form';
 import { useDisclosure } from '@mantine/hooks';
 import { modals } from '@mantine/modals';
-import { IconEye, IconPlus, IconSearch, IconTrash } from '@tabler/icons-react';
+import {
+  IconEye,
+  IconLayoutGrid,
+  IconPlus,
+  IconSearch,
+  IconTable,
+  IconTrash,
+} from '@tabler/icons-react';
 import type { DataTableFilterMeta } from 'primereact/datatable';
 import { Toolbar } from 'primereact/toolbar';
 import { useSelector } from 'react-redux';
@@ -45,9 +52,11 @@ import {
 } from '../../../Utility/NotificationUtil';
 import { appointmentReasons } from '../../Data/DropdownData';
 import { useNavigate } from 'react-router-dom';
+import AppointmentCard from './AppointmentCard';
 
 const Appointment = () => {
   const navigate = useNavigate();
+  const [view, setView] = useState('table');
   const [opened, { open, close }] = useDisclosure(false);
   const [doctors, setDoctors] = useState<DocotrDropdownOption[]>([]);
   const [loading, setLoading] = useState(false);
@@ -105,7 +114,7 @@ const Appointment = () => {
     try {
       // ✅ Fetch appointments
       const appointmentsData: Appointment[] = await getAppointmentsByDoctor(
-        user.profileId
+        user.profileId,
       );
       setAppointments(appointmentsData);
       console.log('appointmentsData', appointmentsData);
@@ -201,14 +210,14 @@ const Appointment = () => {
               prev.map((appointment) =>
                 appointment.id === rowData.id
                   ? { ...appointment, status: 'CANCELLED' }
-                  : appointment
-              )
+                  : appointment,
+              ),
             );
           })
           .catch((error) => {
             errorNotification(
               error?.response?.data?.errorMessage ||
-                'Failed to cancel appointment.'
+                'Failed to cancel appointment.',
             );
           });
       },
@@ -255,7 +264,8 @@ const Appointment = () => {
       successNotification('Appointment scheduled Successfully.');
     } catch (error: any) {
       errorNotification(
-        error?.response?.data?.errorMessage || 'Failed to schedule appointment.'
+        error?.response?.data?.errorMessage ||
+          'Failed to schedule appointment.',
       );
     } finally {
       setLoading(false);
@@ -268,13 +278,24 @@ const Appointment = () => {
 
   const rightToolbarTemplate = () => {
     return (
-      <TextInput
-        leftSection={<IconSearch />}
-        fw={500}
-        value={globalFilterValue}
-        onChange={onGlobalFilterChange}
-        placeholder="Keyword Search"
-      />
+      <div className="flex gap-5 items-center">
+        <SegmentedControl
+          value={view}
+          onChange={setView}
+          color="primary"
+          data={[
+            { label: <IconTable />, value: 'table' },
+            { label: <IconLayoutGrid />, value: 'card' },
+          ]}
+        />
+        <TextInput
+          leftSection={<IconSearch />}
+          fw={500}
+          value={globalFilterValue}
+          onChange={onGlobalFilterChange}
+          placeholder="Keyword Search"
+        />
+      </div>
     );
   };
 
@@ -301,7 +322,7 @@ const Appointment = () => {
       today.getDate(),
       0,
       0,
-      0
+      0,
     );
     const endOfToday = new Date(
       today.getFullYear(),
@@ -309,7 +330,7 @@ const Appointment = () => {
       today.getDate(),
       23,
       59,
-      59
+      59,
     );
 
     if (tab === 'Today') {
@@ -330,75 +351,88 @@ const Appointment = () => {
         start={leftToolbarTemplate}
         end={rightToolbarTemplate}
       ></Toolbar>
-      <DataTable
-        stripedRows
-        value={filteredAppointment}
-        size="small"
-        paginator
-        rows={10}
-        paginatorTemplate="FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink CurrentPageReport RowsPerPageDropdown"
-        rowsPerPageOptions={[10, 25, 50]}
-        dataKey="id"
-        filters={filters}
-        filterDisplay="menu"
-        globalFilterFields={['patientName', 'reason', 'notes', 'status']}
-        emptyMessage="No appointment found."
-        currentPageReportTemplate="Showing {first} to {last} of {totalRecords} entries"
-      >
-        <Column
-          field="patientName"
-          header="Patient"
-          sortable
-          filter
-          filterPlaceholder="Search by name"
-          style={{ minWidth: '14rem' }}
-        />
-        <Column
-          field="patientPhone"
-          header="Phone"
-          style={{ minWidth: '14rem' }}
-          body={(rowData: Appointment) =>
-            rowData.patientPhone ? rowData.patientPhone : '-'
-          }
-        />
-        <Column
-          field="appointmentTime"
-          header="Appointment Time"
-          sortable
-          style={{ minWidth: '14rem' }}
-          body={timeTemplate}
-        />
-        <Column
-          field="reason"
-          header="Reason"
-          sortable
-          filter
-          filterPlaceholder="Search by name"
-          style={{ minWidth: '14rem' }}
-        />
-        <Column
-          field="notes"
-          header="Notes"
-          sortable
-          filter
-          filterPlaceholder="Search by name"
-          style={{ minWidth: '14rem' }}
-        />
-        <Column
-          field="status"
-          header="Status"
-          sortable
-          filterMenuStyle={{ width: '14rem' }}
-          style={{ minWidth: '12rem' }}
-          body={statusBodyTemplate}
-          filter
-        />
-        <Column
-          headerStyle={{ width: '5rem', textAlign: 'center' }}
-          bodyStyle={{ textAlign: 'center', overflow: 'visible' }}
-          body={actionBodyTemplate}
-        />
-      </DataTable>
+      {view === 'table' ? (
+        <DataTable
+          stripedRows
+          value={filteredAppointment}
+          size="small"
+          paginator
+          rows={10}
+          paginatorTemplate="FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink CurrentPageReport RowsPerPageDropdown"
+          rowsPerPageOptions={[10, 25, 50]}
+          dataKey="id"
+          filters={filters}
+          filterDisplay="menu"
+          globalFilterFields={['patientName', 'reason', 'notes', 'status']}
+          emptyMessage="No appointment found."
+          currentPageReportTemplate="Showing {first} to {last} of {totalRecords} entries"
+        >
+          <Column
+            field="patientName"
+            header="Patient"
+            sortable
+            filter
+            filterPlaceholder="Search by name"
+            style={{ minWidth: '14rem' }}
+          />
+          <Column
+            field="patientPhone"
+            header="Phone"
+            style={{ minWidth: '14rem' }}
+            body={(rowData: Appointment) =>
+              rowData.patientPhone ? rowData.patientPhone : '-'
+            }
+          />
+          <Column
+            field="appointmentTime"
+            header="Appointment Time"
+            sortable
+            style={{ minWidth: '14rem' }}
+            body={timeTemplate}
+          />
+          <Column
+            field="reason"
+            header="Reason"
+            sortable
+            filter
+            filterPlaceholder="Search by name"
+            style={{ minWidth: '14rem' }}
+          />
+          <Column
+            field="notes"
+            header="Notes"
+            sortable
+            filter
+            filterPlaceholder="Search by name"
+            style={{ minWidth: '14rem' }}
+          />
+          <Column
+            field="status"
+            header="Status"
+            sortable
+            filterMenuStyle={{ width: '14rem' }}
+            style={{ minWidth: '12rem' }}
+            body={statusBodyTemplate}
+            filter
+          />
+          <Column
+            headerStyle={{ width: '5rem', textAlign: 'center' }}
+            bodyStyle={{ textAlign: 'center', overflow: 'visible' }}
+            body={actionBodyTemplate}
+          />
+        </DataTable>
+      ) : (
+        <div className="grid grid-cols-4 gap-5">
+          {filteredAppointment.map((appointment) => (
+            <AppointmentCard key={appointment.id} {...appointment} />
+          ))}
+          {filteredAppointment.length === 0 && (
+            <div className="col-span-4 text-center text-gray-500">
+              No appointments found.
+            </div>
+          )}
+        </div>
+      )}
 
       <Modal
         opened={opened}

@@ -2,6 +2,7 @@ import {
   IconClock,
   IconEmergencyBed,
   IconNote,
+  IconPhone,
   IconProgress,
   IconUserHeart,
 } from '@tabler/icons-react';
@@ -10,8 +11,8 @@ import { formatDateWithTime } from '../../../Utility/DateUtility';
 
 const AppointmentCard = ({
   id,
-  doctorName,
-  doctorId,
+  patientName,
+  patientPhone,
   notes,
   reason,
   status,
@@ -39,7 +40,14 @@ const AppointmentCard = ({
           size={24}
           className="text-primary-700 bg-primary-100 p-1 rounded-full"
         />
-        <div>{doctorName}</div>
+        <div>{patientName}</div>
+      </div>
+      <div className="flex items-center text-xs gap-2">
+        <IconPhone
+          size={24}
+          className="text-primary-700 bg-primary-100 p-1 rounded-full"
+        />
+        <div>+91 {patientPhone}</div>
       </div>
 
       <div className="flex items-center text-xs gap-2">
