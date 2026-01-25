@@ -1,9 +1,21 @@
-import { ActionIcon, Card, Divider, Grid, Modal, Text, TextInput, Title } from '@mantine/core';
+import {
+  ActionIcon,
+  Card,
+  Divider,
+  Grid,
+  Modal,
+  SegmentedControl,
+  Text,
+  TextInput,
+  Title,
+} from '@mantine/core';
 import { useDisclosure } from '@mantine/hooks';
 import {
   IconEye,
+  IconLayoutGrid,
   IconMedicineSyrup,
-  IconSearch
+  IconSearch,
+  IconTable,
 } from '@tabler/icons-react';
 import { FilterMatchMode } from 'primereact/api';
 import { Column } from 'primereact/column';
@@ -12,8 +24,11 @@ import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { getPrescriptionsByPatientId } from '../../../Service/AppointmentService';
 import { formatDate } from '../../../Utility/DateUtility';
+import { Toolbar } from 'primereact/toolbar';
+import PrescriptionCard from './PrescriptionCard';
 
 const Prescriptions = ({ appointment }: any) => {
+  const [view, setView] = useState('table');
   const [data, setData] = useState<any[]>([]);
   const [opened, { open, close }] = useDisclosure(false);
   const [medicinesData, setMedicinesData] = useState<any>([]);
@@ -71,9 +86,19 @@ const Prescriptions = ({ appointment }: any) => {
     );
   };
 
-  const renderHeader = () => {
+  const rightToolbarTemplate = () => {
     return (
       <div className="flex flex-wrap gap-2 justify-end items-center">
+        <SegmentedControl
+          value={view}
+          onChange={setView}
+          color="primary"
+          data={[
+            { label: <IconTable />, value: 'table' },
+            { label: <IconLayoutGrid />, value: 'card' },
+          ]}
+        />
+
         <TextInput
           leftSection={<IconSearch />}
           fw={500}
@@ -85,46 +110,61 @@ const Prescriptions = ({ appointment }: any) => {
     );
   };
 
-  const header = renderHeader();
-
   return (
     <div>
-      <DataTable
-        header={header}
-        stripedRows
-        value={data}
-        size="small"
-        paginator
-        rows={10}
-        paginatorTemplate="FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink CurrentPageReport RowsPerPageDropdown"
-        rowsPerPageOptions={[10, 25, 50]}
-        dataKey="id"
-        filterDisplay="menu"
-        globalFilterFields={['doctorName', 'notes']}
-        emptyMessage="No appointment found."
-        currentPageReportTemplate="Showing {first} to {last} of {totalRecords} entries"
-      >
-        <Column field="doctorName" header="Doctor" />
+      <Toolbar className="mb-4 !p-1" end={rightToolbarTemplate}></Toolbar>
+      {view === 'table' ? (
+        <DataTable
+          stripedRows
+          value={data}
+          size="small"
+          paginator
+          rows={10}
+          paginatorTemplate="FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink CurrentPageReport RowsPerPageDropdown"
+          rowsPerPageOptions={[10, 25, 50]}
+          dataKey="id"
+          filterDisplay="menu"
+          globalFilterFields={['doctorName', 'notes']}
+          emptyMessage="No appointment found."
+          currentPageReportTemplate="Showing {first} to {last} of {totalRecords} entries"
+        >
+          <Column field="doctorName" header="Doctor" />
 
-        <Column
-          field="prescriptionDate"
-          header="Prescription Date"
-          sortable
-          body={(rowData) => formatDate(rowData.prescriptionDate)}
-        />
-        <Column
-          field="medicine"
-          header="Medicines"
-          body={(rowData) => rowData.medicines?.length ?? 0}
-        />
+          <Column
+            field="prescriptionDate"
+            header="Prescription Date"
+            sortable
+            body={(rowData) => formatDate(rowData.prescriptionDate)}
+          />
+          <Column
+            field="medicine"
+            header="Medicines"
+            body={(rowData) => rowData.medicines?.length ?? 0}
+          />
 
-        <Column field="notes" header="Notes" style={{ minWidth: '14rem' }} />
-        <Column
-          headerStyle={{ width: '5rem', textAlign: 'center' }}
-          bodyStyle={{ textAlign: 'center', overflow: 'visible' }}
-          body={actionBodyTemplate}
-        />
-      </DataTable>
+          <Column field="notes" header="Notes" style={{ minWidth: '14rem' }} />
+          <Column
+            headerStyle={{ width: '5rem', textAlign: 'center' }}
+            bodyStyle={{ textAlign: 'center', overflow: 'visible' }}
+            body={actionBodyTemplate}
+          />
+        </DataTable>
+      ) : (
+        <div className="grid grid-cols-4 gap-5">
+          {data.map((prescription) => (
+            <PrescriptionCard
+              key={prescription.id}
+              handleMedicine={handleMedicine}
+              {...prescription}
+            />
+          ))}
+          {data.length === 0 && (
+            <div className="col-span-4 text-center text-gray-500">
+              No prescriptions found.
+            </div>
+          )}
+        </div>
+      )}
       <Modal
         size="xl"
         opened={opened}

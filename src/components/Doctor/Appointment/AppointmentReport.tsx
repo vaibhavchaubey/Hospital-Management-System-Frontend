@@ -5,13 +5,20 @@ import {
   Group,
   MultiSelect,
   NumberInput,
+  SegmentedControl,
   Select,
   Textarea,
   TextInput,
   type SelectProps,
 } from '@mantine/core';
 import { useForm } from '@mantine/form';
-import { IconCheck, IconSearch, IconTrash } from '@tabler/icons-react';
+import {
+  IconCheck,
+  IconLayoutGrid,
+  IconSearch,
+  IconTable,
+  IconTrash,
+} from '@tabler/icons-react';
 import { FilterMatchMode } from 'primereact/api';
 import { Column } from 'primereact/column';
 import { DataTable, type DataTableFilterMeta } from 'primereact/datatable';
@@ -33,6 +40,8 @@ import {
   symptoms,
   tests,
 } from '../../Data/DropdownData';
+import { Toolbar } from 'primereact/toolbar';
+import ReportCard from './ReportCard';
 
 type Medicine = {
   name: string;
@@ -47,6 +56,7 @@ type Medicine = {
 };
 
 const AppointmentReport = ({ appointment }: any) => {
+  const [view, setView] = useState('table');
   const [loading, setLoading] = useState(false);
   const [data, setData] = useState<any[]>([]);
   const [allowAdd, setAllowAdd] = useState<boolean>(false);
@@ -136,7 +146,7 @@ const AppointmentReport = ({ appointment }: any) => {
           response.reduce((acc: any, item: any) => {
             acc[item.id] = item;
             return acc;
-          }, {})
+          }, {}),
         );
       })
       .catch((err) => {
@@ -189,7 +199,7 @@ const AppointmentReport = ({ appointment }: any) => {
     } catch (err: any) {
       console.error('Error creating report:', err);
       errorNotification(
-        err?.response?.data?.errorMessage || 'Failed to create report'
+        err?.response?.data?.errorMessage || 'Failed to create report',
       );
     } finally {
       setLoading(false);
@@ -206,25 +216,6 @@ const AppointmentReport = ({ appointment }: any) => {
         >  
           <IconEye size={20} stroke={1.5} />
         </ActionIcon> */}
-      </div>
-    );
-  };
-
-  const renderHeader = () => {
-    return (
-      <div className="flex flex-wrap gap-2 justify-between items-center">
-        {allowAdd && (
-          <Button variant="filled" onClick={() => setEdit(true)}>
-            Add Report
-          </Button>
-        )}
-        <TextInput
-          leftSection={<IconSearch />}
-          fw={500}
-          value={globalFilterValue}
-          onChange={onGlobalFilterChange}
-          placeholder="Keyword Search"
-        />
       </div>
     );
   };
@@ -257,15 +248,15 @@ const AppointmentReport = ({ appointment }: any) => {
       form.setFieldValue(`prescription.medicines.${index}.medicineId`, medId);
       form.setFieldValue(
         `prescription.medicines.${index}.name`,
-        medicineMap[medId]?.name || ''
+        medicineMap[medId]?.name || '',
       );
       form.setFieldValue(
         `prescription.medicines.${index}.dosage`,
-        medicineMap[medId]?.dosage || ''
+        medicineMap[medId]?.dosage || '',
       );
       form.setFieldValue(
         `prescription.medicines.${index}.type`,
-        medicineMap[medId]?.type || ''
+        medicineMap[medId]?.type || '',
       );
     } else {
       form.setFieldValue(`prescription.medicines.${index}.medicineId`, 'OTHER');
@@ -275,44 +266,99 @@ const AppointmentReport = ({ appointment }: any) => {
     }
   };
 
-  const header = renderHeader();
+  const startToolbarTemplate = () => {
+    return (
+      allowAdd && (
+        <Button variant="filled" onClick={() => setEdit(true)}>
+          Add Report
+        </Button>
+      )
+    );
+  };
+
+  const rightToolbarTemplate = () => {
+    return (
+      <div className="flex flex-wrap gap-2 justify-end items-center">
+        <SegmentedControl
+          value={view}
+          onChange={setView}
+          color="primary"
+          data={[
+            { label: <IconTable />, value: 'table' },
+            { label: <IconLayoutGrid />, value: 'card' },
+          ]}
+        />
+
+        <TextInput
+          leftSection={<IconSearch />}
+          fw={500}
+          value={globalFilterValue}
+          onChange={onGlobalFilterChange}
+          placeholder="Keyword Search"
+        />
+      </div>
+    );
+  };
 
   return (
     <div>
       {!edit ? (
-        <DataTable
-          header={header}
-          stripedRows
-          value={data}
-          size="small"
-          paginator
-          rows={10}
-          paginatorTemplate="FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink CurrentPageReport RowsPerPageDropdown"
-          rowsPerPageOptions={[10, 25, 50]}
-          dataKey="id"
-          filterDisplay="menu"
-          globalFilterFields={['doctorName', 'notes']}
-          emptyMessage="No appointment found."
-          currentPageReportTemplate="Showing {first} to {last} of {totalRecords} entries"
-        >
-          <Column field="doctorName" header="Doctor" />
+        <div>
+          <Toolbar
+            className="mb-4"
+            start={startToolbarTemplate}
+            end={rightToolbarTemplate}
+          ></Toolbar>
+          {view === 'table' ? (
+            <DataTable
+              stripedRows
+              value={data}
+              size="small"
+              paginator
+              rows={10}
+              paginatorTemplate="FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink CurrentPageReport RowsPerPageDropdown"
+              rowsPerPageOptions={[10, 25, 50]}
+              dataKey="id"
+              filterDisplay="menu"
+              globalFilterFields={['doctorName', 'notes']}
+              emptyMessage="No appointment found."
+              currentPageReportTemplate="Showing {first} to {last} of {totalRecords} entries"
+            >
+              <Column field="doctorName" header="Doctor" />
 
-          <Column field="diagnosis" header="Diagnosis" />
+              <Column field="diagnosis" header="Diagnosis" />
 
-          <Column
-            field="reportDate"
-            header="Report Date"
-            sortable
-            body={(rowData) => formatDate(rowData.createdAt)}
-          />
+              <Column
+                field="reportDate"
+                header="Report Date"
+                sortable
+                body={(rowData) => formatDate(rowData.createdAt)}
+              />
 
-          <Column field="notes" header="Notes" style={{ minWidth: '14rem' }} />
-          <Column
-            headerStyle={{ width: '5rem', textAlign: 'center' }}
-            bodyStyle={{ textAlign: 'center', overflow: 'visible' }}
-            body={actionBodyTemplate}
-          />
-        </DataTable>
+              <Column
+                field="notes"
+                header="Notes"
+                style={{ minWidth: '14rem' }}
+              />
+              <Column
+                headerStyle={{ width: '5rem', textAlign: 'center' }}
+                bodyStyle={{ textAlign: 'center', overflow: 'visible' }}
+                body={actionBodyTemplate}
+              />
+            </DataTable>
+          ) : (
+            <div className="grid grid-cols-4 gap-5">
+              {data.map((report) => (
+                <ReportCard key={report.id} {...report} />
+              ))}
+              {data.length === 0 && (
+                <div className="col-span-4 text-center text-gray-500">
+                  No reports found.
+                </div>
+              )}
+            </div>
+          )}
+        </div>
       ) : (
         <form onSubmit={form.onSubmit(handleSubmit)} className="grid gap-5">
           <Fieldset
@@ -393,7 +439,7 @@ const AppointmentReport = ({ appointment }: any) => {
                 >
                   <Select
                     {...form.getInputProps(
-                      `prescription.medicines.${index}.medicineId`
+                      `prescription.medicines.${index}.medicineId`,
                     )}
                     label="Medicine"
                     placeholder="Select medicine"
@@ -404,8 +450,8 @@ const AppointmentReport = ({ appointment }: any) => {
                           (x: any) =>
                             !form.values.prescription.medicines.some(
                               (item1, idx) =>
-                                item1.medicineId == x.id && idx != index
-                            )
+                                item1.medicineId == x.id && idx != index,
+                            ),
                         )
                         .map((item) => ({
                           ...item,
@@ -424,7 +470,7 @@ const AppointmentReport = ({ appointment }: any) => {
                   {med.medicineId == 'OTHER' && (
                     <TextInput
                       {...form.getInputProps(
-                        `prescription.medicines.${index}.name`
+                        `prescription.medicines.${index}.name`,
                       )}
                       withAsterisk
                       label="Medicine"
@@ -435,7 +481,7 @@ const AppointmentReport = ({ appointment }: any) => {
                   <TextInput
                     disabled={med.medicineId != 'OTHER'}
                     {...form.getInputProps(
-                      `prescription.medicines.${index}.dosage`
+                      `prescription.medicines.${index}.dosage`,
                     )}
                     withAsterisk
                     label="Dosage"
@@ -443,7 +489,7 @@ const AppointmentReport = ({ appointment }: any) => {
                   />
                   <Select
                     {...form.getInputProps(
-                      `prescription.medicines.${index}.frequency`
+                      `prescription.medicines.${index}.frequency`,
                     )}
                     withAsterisk
                     label="Frequency"
@@ -453,7 +499,7 @@ const AppointmentReport = ({ appointment }: any) => {
 
                   <NumberInput
                     {...form.getInputProps(
-                      `prescription.medicines.${index}.duration`
+                      `prescription.medicines.${index}.duration`,
                     )}
                     withAsterisk
                     label="Duration (days)"
@@ -479,7 +525,7 @@ const AppointmentReport = ({ appointment }: any) => {
                   <Select
                     disabled={med.medicineId != 'OTHER'}
                     {...form.getInputProps(
-                      `prescription.medicines.${index}.type`
+                      `prescription.medicines.${index}.type`,
                     )}
                     withAsterisk
                     label="Type"
@@ -489,14 +535,14 @@ const AppointmentReport = ({ appointment }: any) => {
 
                   <TextInput
                     {...form.getInputProps(
-                      `prescription.medicines.${index}.instructions`
+                      `prescription.medicines.${index}.instructions`,
                     )}
                     withAsterisk
                     label="Instructions"
                     placeholder="Enter instructions"
                   />
                 </Fieldset>
-              )
+              ),
             )}
 
             <div className="flex justify-center items-center col-span-2">
