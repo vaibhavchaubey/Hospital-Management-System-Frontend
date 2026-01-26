@@ -1,5 +1,5 @@
+import { Badge } from '@mantine/core';
 import {
-  IconCurrencyRupee,
   IconMedicineSyrup,
   IconPill,
   IconPills,
@@ -7,7 +7,6 @@ import {
   IconVaccine,
 } from '@tabler/icons-react';
 import { formatDate } from '../../../Utility/DateUtility';
-import { Tag } from 'primereact/tag';
 
 const InventoryCard = ({
   id,
@@ -20,18 +19,6 @@ const InventoryCard = ({
   medicineMap,
   onEdit,
 }: any) => {
-  const getSeverity = (status: string) => {
-    switch (status) {
-      case 'EXPIRED':
-        return 'danger';
-
-      case 'ACTIVE':
-        return 'success';
-
-      default:
-        return null;
-    }
-  };
   return (
     <div
       onClick={onEdit}
@@ -79,7 +66,9 @@ const InventoryCard = ({
           size={24}
           className="text-primary-700 bg-primary-100 p-1 rounded-full"
         />
-        <Tag value={status} severity={getSeverity(status)} />
+        <Badge color={status === 'EXPIRED' ? 'red' : 'green'}>
+          {status === 'EXPIRED' ? 'Expired' : 'Active'}
+        </Badge>
       </div>
     </div>
   );
