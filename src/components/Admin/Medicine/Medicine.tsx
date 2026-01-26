@@ -206,11 +206,7 @@ const Medicine = () => {
           {view === 'table' ? (
             <DataTable
               stripedRows
-              value={
-                <Button variant="filled" onClick={() => setEdit(true)}>
-                  Add Medicine
-                </Button>
-              }
+              value={data}
               size="small"
               paginator
               rows={10}
