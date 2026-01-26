@@ -5,16 +5,24 @@ import {
   Fieldset,
   Group,
   NumberInput,
+  SegmentedControl,
   Select,
   TextInput,
   type SelectProps,
 } from '@mantine/core';
 import { DateInput } from '@mantine/dates';
 import { useForm } from '@mantine/form';
-import { IconCheck, IconEdit, IconSearch } from '@tabler/icons-react';
+import {
+  IconCheck,
+  IconEdit,
+  IconLayoutGrid,
+  IconSearch,
+  IconTable,
+} from '@tabler/icons-react';
 import { FilterMatchMode } from 'primereact/api';
 import { Column } from 'primereact/column';
 import { DataTable, type DataTableFilterMeta } from 'primereact/datatable';
+import { Toolbar } from 'primereact/toolbar';
 import { useEffect, useState } from 'react';
 import {
   addStock,
@@ -27,8 +35,10 @@ import {
   errorNotification,
   successNotification,
 } from '../../../Utility/NotificationUtil';
+import InventoryCard from './InventoryCard';
 
 const Inventory = () => {
+  const [view, setView] = useState('table');
   const [loading, setLoading] = useState(false);
   const [data, setData] = useState<any[]>([]);
   const [medicine, setMedicine] = useState<any[]>([]);
@@ -61,7 +71,7 @@ const Inventory = () => {
           response.reduce((acc: any, item: any) => {
             acc[item.id] = item;
             return acc;
-          }, {})
+          }, {}),
         );
       })
       .catch((err) => {
@@ -135,7 +145,7 @@ const Inventory = () => {
       console.error('Error creating report:', err);
       errorNotification(
         err?.response?.data?.errorMessage ||
-          `Failed to ${update ? 'update' : 'add'} stock`
+          `Failed to ${update ? 'update' : 'add'} stock`,
       );
     } finally {
       setLoading(false);
@@ -148,24 +158,6 @@ const Inventory = () => {
         <ActionIcon onClick={() => onEdit(rowData)}>
           <IconEdit size={20} stroke={1.5} />
         </ActionIcon>
-      </div>
-    );
-  };
-
-  const renderHeader = () => {
-    return (
-      <div className="flex flex-wrap gap-2 justify-between items-center">
-        <Button variant="filled" onClick={() => setEdit(true)}>
-          Add Stock
-        </Button>
-
-        <TextInput
-          leftSection={<IconSearch />}
-          fw={500}
-          value={globalFilterValue}
-          onChange={onGlobalFilterChange}
-          placeholder="Keyword Search"
-        />
       </div>
     );
   };
@@ -202,58 +194,112 @@ const Inventory = () => {
     );
   };
 
-  const header = renderHeader();
+  const startToolbarTemplate = () => {
+    return (
+      <Button variant="filled" onClick={() => setEdit(true)}>
+        Add Stock
+      </Button>
+    );
+  };
+
+  const rightToolbarTemplate = () => {
+    return (
+      <div className="flex flex-wrap gap-2 justify-end items-center">
+        <SegmentedControl
+          value={view}
+          onChange={setView}
+          color="primary"
+          data={[
+            { label: <IconTable />, value: 'table' },
+            { label: <IconLayoutGrid />, value: 'card' },
+          ]}
+        />
+
+        <TextInput
+          leftSection={<IconSearch />}
+          fw={500}
+          value={globalFilterValue}
+          onChange={onGlobalFilterChange}
+          placeholder="Keyword Search"
+        />
+      </div>
+    );
+  };
 
   return (
     <div>
       {!edit ? (
-        <DataTable
-          header={header}
-          stripedRows
-          value={data}
-          size="small"
-          paginator
-          rows={10}
-          paginatorTemplate="FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink CurrentPageReport RowsPerPageDropdown"
-          rowsPerPageOptions={[10, 25, 50]}
-          dataKey="id"
-          filterDisplay="menu"
-          globalFilterFields={['doctorName', 'notes']}
-          emptyMessage="No appointment found."
-          currentPageReportTemplate="Showing {first} to {last} of {totalRecords} entries"
-        >
-          <Column
-            field="name"
-            header="Medicine"
-            body={(rowData) => (
-              <div className="flex flex-col">
-                <span className="font-medium">
-                  {medicineMap['' + rowData.medicineId]?.name}
-                </span>
+        <div>
+          <Toolbar
+            className="mb-4 !p-1"
+            start={startToolbarTemplate}
+            end={rightToolbarTemplate}
+          ></Toolbar>
+          {view === 'table' ? (
+            <DataTable
+              stripedRows
+              value={data}
+              size="small"
+              paginator
+              rows={10}
+              paginatorTemplate="FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink CurrentPageReport RowsPerPageDropdown"
+              rowsPerPageOptions={[10, 25, 50]}
+              dataKey="id"
+              filterDisplay="menu"
+              globalFilterFields={['doctorName', 'notes']}
+              emptyMessage="No appointment found."
+              currentPageReportTemplate="Showing {first} to {last} of {totalRecords} entries"
+            >
+              <Column
+                field="name"
+                header="Medicine"
+                body={(rowData) => (
+                  <div className="flex flex-col">
+                    <span className="font-medium">
+                      {medicineMap['' + rowData.medicineId]?.name}
+                    </span>
 
-                <span className="text-xs text-gray-600">
-                  {medicineMap['' + rowData.medicineId]?.manufacturer}
-                </span>
-              </div>
-            )}
-          />
-          <Column field="batchNo" header="Batch No." />
-          <Column field="initialQuantity" header="Quantity" />
-          <Column field="quantity" header="Remaining Quantity" />
-          <Column
-            field="expiryDate"
-            header="Expiry Date"
-            sortable
-            body={(rowData) => formatDate(rowData.expiryDate)}
-          />
-          <Column field="status" header="Status" body={statusBody} />
+                    <span className="text-xs text-gray-600">
+                      {medicineMap['' + rowData.medicineId]?.manufacturer}
+                    </span>
+                  </div>
+                )}
+              />
+              <Column field="batchNo" header="Batch No." />
+              <Column field="initialQuantity" header="Quantity" />
+              <Column field="quantity" header="Remaining Quantity" />
+              <Column
+                field="expiryDate"
+                header="Expiry Date"
+                sortable
+                body={(rowData) => formatDate(rowData.expiryDate)}
+              />
+              <Column field="status" header="Status" body={statusBody} />
 
-          <Column
-            headerStyle={{ textAlign: 'center' }}
-            bodyStyle={{ textAlign: 'center', overflow: 'visible' }}
-            body={actionBodyTemplate}
-          />
-        </DataTable>
+              <Column
+                headerStyle={{ textAlign: 'center' }}
+                bodyStyle={{ textAlign: 'center', overflow: 'visible' }}
+                body={actionBodyTemplate}
+              />
+            </DataTable>
+          ) : (
+            <div className="grid grid-cols-4 gap-5">
+              {data.map((inventory) => (
+                <InventoryCard
+                  key={inventory.id}
+                  {...inventory}
+                  medicineMap={medicineMap}
+                  onEdit={() => onEdit(inventory)}
+                />
+              ))}
+              {data.length === 0 && (
+                <div className="col-span-4 text-center text-gray-500">
+                  No inventory found.
+                </div>
+              )}
+            </div>
+          )}
+        </div>
       ) : (
         <form onSubmit={form.onSubmit(handleSubmit)} className="grid gap-5">
           <Fieldset

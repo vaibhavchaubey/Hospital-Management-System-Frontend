@@ -10,14 +10,15 @@ import {
   LoadingOverlay,
   Modal,
   NumberInput,
+  SegmentedControl,
   Select,
   Text,
   TextInput,
   Title,
   type SelectProps,
 } from '@mantine/core';
-import { Spotlight, SpotlightAction, spotlight } from '@mantine/spotlight';
-import { IconSearch } from '@tabler/icons-react';
+import { Spotlight, spotlight } from '@mantine/spotlight';
+import { IconLayoutGrid, IconSearch, IconTable } from '@tabler/icons-react';
 
 import { useForm } from '@mantine/form';
 import { useDisclosure } from '@mantine/hooks';
@@ -42,6 +43,8 @@ import {
   successNotification,
 } from '../../../Utility/NotificationUtil';
 import { freqMap } from '../../Data/DropdownData';
+import { Toolbar } from 'primereact/toolbar';
+import SaleCard from './SaleCard';
 
 interface SaleItem {
   medicineId: string;
@@ -49,6 +52,7 @@ interface SaleItem {
 }
 
 const Sales = () => {
+  const [view, setView] = useState('table');
   const [loading, setLoading] = useState(false);
   const [data, setData] = useState<any[]>([]);
   const [medicine, setMedicine] = useState<any[]>([]);
@@ -87,7 +91,7 @@ const Sales = () => {
           response.reduce((acc: any, item: any) => {
             acc[item.id] = item;
             return acc;
-          }, {})
+          }, {}),
         );
       })
       .catch((err) => {
@@ -104,7 +108,7 @@ const Sales = () => {
               prescription.doctorName
             } on ${formatDate(prescription.prescriptionDate)}`,
             onClick: () => handleImport(prescription),
-          }))
+          })),
         );
       })
       .catch((err) => {
@@ -179,10 +183,13 @@ const Sales = () => {
   const handleSubmit = async (values: any) => {
     setLoading(true);
     let flag = false;
-    values.saleItems.forEach((item: any, index:number) => {
+    values.saleItems.forEach((item: any, index: number) => {
       if (item.quantity > (medicineMap[item.medicineId]?.stock || 0)) {
         flag = true;
-        form.setFieldError(`saleItems.${index}.quantity`, 'Quantity exceeds available stock');
+        form.setFieldError(
+          `saleItems.${index}.quantity`,
+          'Quantity exceeds available stock',
+        );
       }
     });
 
@@ -198,7 +205,7 @@ const Sales = () => {
 
     const totalAmount = saleItems.reduce(
       (acc: number, item: any) => acc + item.quantity * item.unitPrice,
-      0
+      0,
     );
 
     try {
@@ -214,7 +221,7 @@ const Sales = () => {
     } catch (err: any) {
       console.error('Error creating report:', err);
       errorNotification(
-        err?.response?.data?.errorMessage || `Failed to sold Medicines`
+        err?.response?.data?.errorMessage || `Failed to sold Medicines`,
       );
     } finally {
       setLoading(false);
@@ -227,24 +234,6 @@ const Sales = () => {
         <ActionIcon onClick={() => handleDetails(rowData)}>
           <IconEye size={20} stroke={1.5} />
         </ActionIcon>
-      </div>
-    );
-  };
-
-  const renderHeader = () => {
-    return (
-      <div className="flex flex-wrap gap-2 justify-between items-center">
-        <Button variant="filled" onClick={() => setEdit(true)}>
-          Sell Medicine
-        </Button>
-
-        <TextInput
-          leftSection={<IconSearch />}
-          fw={500}
-          value={globalFilterValue}
-          onChange={onGlobalFilterChange}
-          placeholder="Keyword Search"
-        />
       </div>
     );
   };
@@ -328,44 +317,98 @@ const Sales = () => {
       });
   };
 
-  const header = renderHeader();
+  const startToolbarTemplate = () => {
+    return (
+      <Button variant="filled" onClick={() => setEdit(true)}>
+        Sell Medicine
+      </Button>
+    );
+  };
+
+  const rightToolbarTemplate = () => {
+    return (
+      <div className="flex flex-wrap gap-2 justify-end items-center">
+        <SegmentedControl
+          value={view}
+          onChange={setView}
+          color="primary"
+          data={[
+            { label: <IconTable />, value: 'table' },
+            { label: <IconLayoutGrid />, value: 'card' },
+          ]}
+        />
+
+        <TextInput
+          leftSection={<IconSearch />}
+          fw={500}
+          value={globalFilterValue}
+          onChange={onGlobalFilterChange}
+          placeholder="Keyword Search"
+        />
+      </div>
+    );
+  };
 
   return (
     <div>
       {!edit ? (
-        <DataTable
-          header={header}
-          removableSort
-          stripedRows
-          value={data}
-          size="small"
-          paginator
-          rows={10}
-          paginatorTemplate="FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink CurrentPageReport RowsPerPageDropdown"
-          rowsPerPageOptions={[10, 25, 50]}
-          dataKey="id"
-          filterDisplay="menu"
-          globalFilterFields={['doctorName', 'notes']}
-          emptyMessage="No sales found."
-          currentPageReportTemplate="Showing {first} to {last} of {totalRecords} entries"
-        >
-          <Column field="buyerName" header="Buyer" />
-          <Column field="buyerContact" header="Contact" />
-          {/* <Column field="prescriptionId" header="PrescriptionId" /> */}
-          <Column field="totalAmount" header="Total Amount" sortable />
-          <Column
-            field="saleDate"
-            header="Sale Date"
-            sortable
-            body={(rowData) => formatDate(rowData.saleDate)}
-          />
+        <div>
+          <Toolbar
+            className="mb-4 !p-1"
+            start={startToolbarTemplate}
+            end={rightToolbarTemplate}
+          ></Toolbar>
+          {view === 'table' ? (
+            <DataTable
+              removableSort
+              stripedRows
+              value={data}
+              size="small"
+              paginator
+              rows={10}
+              paginatorTemplate="FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink CurrentPageReport RowsPerPageDropdown"
+              rowsPerPageOptions={[10, 25, 50]}
+              dataKey="id"
+              filterDisplay="menu"
+              globalFilterFields={['doctorName', 'notes']}
+              emptyMessage="No sales found."
+              currentPageReportTemplate="Showing {first} to {last} of {totalRecords} entries"
+            >
+              <Column field="buyerName" header="Buyer" />
+              <Column field="buyerContact" header="Contact" />
+              {/* <Column field="prescriptionId" header="PrescriptionId" /> */}
+              <Column field="totalAmount" header="Total Amount" sortable />
+              <Column
+                field="saleDate"
+                header="Sale Date"
+                sortable
+                body={(rowData) => formatDate(rowData.saleDate)}
+              />
 
-          <Column
-            headerStyle={{ textAlign: 'center' }}
-            bodyStyle={{ textAlign: 'center', overflow: 'visible' }}
-            body={actionBodyTemplate}
-          />
-        </DataTable>
+              <Column
+                headerStyle={{ textAlign: 'center' }}
+                bodyStyle={{ textAlign: 'center', overflow: 'visible' }}
+                body={actionBodyTemplate}
+              />
+            </DataTable>
+          ) : (
+            <div className="grid grid-cols-4 gap-5">
+              {data.map((sale) => (
+                <SaleCard
+                  key={sale.id}
+                  {...sale}
+                  medicineMap={medicineMap}
+                  onView={() => handleDetails(sale)}
+                />
+              ))}
+              {data.length === 0 && (
+                <div className="col-span-4 text-center text-gray-500">
+                  No sales found.
+                </div>
+              )}
+            </div>
+          )}
+        </div>
       ) : (
         <div>
           <div className="mb-5 flex items-center justify-between">
@@ -429,8 +472,8 @@ const Sales = () => {
                             (x) =>
                               !form.values.saleItems.some(
                                 (item1, idx) =>
-                                  item1.medicineId == x.id && idx != index
-                              )
+                                  item1.medicineId == x.id && idx != index,
+                              ),
                           )
                           .map((item) => ({
                             ...item,
