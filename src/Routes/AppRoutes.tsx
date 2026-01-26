@@ -4,61 +4,69 @@ import PublicRoute from './PublicRoute';
 import ProtectedRoute from './ProtectedRoute';
 
 const AdminDashboard = React.lazy(
-  () => import('../components/Layout/AdminDashboard')
+  () => import('../components/Layout/AdminDashboard'),
 );
 const Random = React.lazy(() => import('../components/Random'));
 const LoginPage = React.lazy(() => import('../pages/LoginPage'));
 const RegisterPage = React.lazy(() => import('../pages/RegisterPage'));
 const PatientDashboard = React.lazy(
-  () => import('../components/Layout/PatientDashboard')
+  () => import('../components/Layout/PatientDashboard'),
 );
 const DoctorDashboard = React.lazy(
-  () => import('../components/Layout/DoctorDashboard')
+  () => import('../components/Layout/DoctorDashboard'),
 );
 const DoctorProfilePage = React.lazy(
-  () => import('../pages/Doctor/DoctorProfilePage')
+  () => import('../pages/Doctor/DoctorProfilePage'),
 );
 const PatientProfilePage = React.lazy(
-  () => import('../pages/Patient/PatientProfilePage')
+  () => import('../pages/Patient/PatientProfilePage'),
 );
 const PatientAppointmentPage = React.lazy(
-  () => import('../pages/Patient/PatientAppointmentPage')
+  () => import('../pages/Patient/PatientAppointmentPage'),
 );
 const DoctorAppointmentPage = React.lazy(
-  () => import('../pages/Doctor/DoctorAppointmentPage')
+  () => import('../pages/Doctor/DoctorAppointmentPage'),
 );
 const DoctorAppointmentDetailsPage = React.lazy(
-  () => import('../pages/Doctor/DoctorAppointmentDetailsPage')
+  () => import('../pages/Doctor/DoctorAppointmentDetailsPage'),
 );
 const AdminMedicinePage = React.lazy(
-  () => import('../pages/Admin/AdminMedicinePage')
+  () => import('../pages/Admin/AdminMedicinePage'),
 );
 const NotFoundPage = React.lazy(() => import('../pages/NotFoundPage'));
 const AdminInventoryPage = React.lazy(
-  () => import('../pages/Admin/AdminInventoryPage')
+  () => import('../pages/Admin/AdminInventoryPage'),
 );
 const AdminSalesPage = React.lazy(
-  () => import('../pages/Admin/AdminSalesPage')
+  () => import('../pages/Admin/AdminSalesPage'),
 );
 
 const AdminPatientsPage = React.lazy(
-  () => import('../pages/Admin/AdminPatientsPage')
+  () => import('../pages/Admin/AdminPatientsPage'),
 );
 
 const AdminDoctorsPage = React.lazy(
-  () => import('../pages/Admin/AdminDoctorsPage')
+  () => import('../pages/Admin/AdminDoctorsPage'),
 );
 
 const AdminDashboardPage = React.lazy(
-  () => import('../pages/Admin/AdminDashboardPage')
+  () => import('../pages/Admin/AdminDashboardPage'),
 );
 
 const DoctorDashboardPage = React.lazy(
-  () => import('../pages/Doctor/DoctorDashboardPage')
+  () => import('../pages/Doctor/DoctorDashboardPage'),
 );
 
 const PatientDashboardPage = React.lazy(
-  () => import('../pages/Patient/PatientDashboardPage')
+  () => import('../pages/Patient/PatientDashboardPage'),
+);
+
+const DoctorPatientPage = React.lazy(
+  () => import('../pages/Doctor/DoctorPatientPage'),
+);
+
+const DoctorPharmacyPage = React.lazy(
+  () => import('../pages/Doctor/DoctorPharmacyPage'),
 );
 
 const AppRoutes = () => {
@@ -108,8 +116,8 @@ const AppRoutes = () => {
           >
             <Route path="dashboard" element={<DoctorDashboardPage />} />
             <Route path="profile" element={<DoctorProfilePage />} />
-            <Route path="pharmacy" element={<Random />} />
-            <Route path="patients" element={<Random />} />
+            <Route path="pharmacy" element={<DoctorPharmacyPage />} />
+            <Route path="patients" element={<DoctorPatientPage />} />
             <Route path="appointments" element={<DoctorAppointmentPage />} />
             <Route
               path="appointments/:id"
