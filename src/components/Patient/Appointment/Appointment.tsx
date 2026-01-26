@@ -18,7 +18,7 @@ import React, { useEffect, useState } from 'react';
 import { TextInput } from '@mantine/core';
 import { DateTimePicker } from '@mantine/dates';
 import { useForm } from '@mantine/form';
-import { useDisclosure } from '@mantine/hooks';
+import { useDisclosure, useMediaQuery } from '@mantine/hooks';
 import { modals } from '@mantine/modals';
 import {
   IconEdit,
@@ -67,6 +67,8 @@ const Appointment = () => {
   const [tab, setTab] = useState<string>('Today');
 
   const user: User = useSelector((state: any) => state.user);
+
+  const matches = useMediaQuery('(max-width: 768px)');
 
   const [filters, setFilters] = useState<DataTableFilterMeta>({
     global: { value: null, matchMode: FilterMatchMode.CONTAINS },
@@ -166,24 +168,6 @@ const Appointment = () => {
     },
   });
 
-  const renderHeader = () => {
-    return (
-      <div className="flex flex-wrap gap-2 justify-between items-center">
-        <Button leftSection={<IconPlus />} onClick={open} variant="filled">
-          Schedule Appoinment
-        </Button>
-
-        <TextInput
-          leftSection={<IconSearch />}
-          fw={500}
-          value={globalFilterValue}
-          onChange={onGlobalFilterChange}
-          placeholder="Keyword Search"
-        />
-      </div>
-    );
-  };
-
   const statusBodyTemplate = (rowData: Appointment) => {
     return (
       <Tag value={rowData.status} severity={getSeverity(rowData.status)} />
@@ -229,17 +213,15 @@ const Appointment = () => {
   const actionBodyTemplate = (rowData: Appointment) => {
     return (
       <div className="flex gap-2">
-        <ActionIcon>
+        {/* <ActionIcon>
           <IconEdit size={20} stroke={1.5} />
-        </ActionIcon>
+        </ActionIcon> */}
         <ActionIcon color="red" onClick={() => handleDelete(rowData)}>
           <IconTrash size={20} stroke={1.5} />
         </ActionIcon>
       </div>
     );
   };
-
-  const header = renderHeader();
 
   const handleSubmit = async (values: ScheduleAppointmentFormValues) => {
     console.log('Form Values:', values);
@@ -278,18 +260,24 @@ const Appointment = () => {
 
   const leftToolbarTemplate = () => {
     return (
-      <Button leftSection={<IconPlus />} onClick={open} variant="filled">
-        Schedule Appoinment
+      <Button
+        leftSection={<IconPlus />}
+        size={matches ? 'xs' : 'md'}
+        onClick={open}
+        variant="filled"
+      >
+        Schedule
       </Button>
     );
   };
 
   const rightToolbarTemplate = () => {
     return (
-      <div className="flex gap-5 items-center">
+      <div className="md:flex hidden gap-5 items-center">
         <SegmentedControl
           value={view}
           onChange={setView}
+          size={matches ? 'xs' : 'md'}
           color="primary"
           data={[
             { label: <IconTable />, value: 'table' },
@@ -297,6 +285,7 @@ const Appointment = () => {
           ]}
         />
         <TextInput
+          className="lg:block hidden"
           leftSection={<IconSearch />}
           fw={500}
           value={globalFilterValue}
@@ -310,6 +299,7 @@ const Appointment = () => {
   const centerToolbarTemplate = () => {
     return (
       <SegmentedControl
+        size={matches ? 'xs' : 'md'}
         variant="filled"
         color={tab === 'Today' ? 'blue' : tab === 'Upcoming' ? 'green' : 'red'}
         value={tab}
@@ -355,12 +345,12 @@ const Appointment = () => {
   return (
     <div className="card">
       <Toolbar
-        className="mb-4"
+        className="mb-4 md:p-3 p-1"
         start={leftToolbarTemplate}
         center={centerToolbarTemplate}
         end={rightToolbarTemplate}
       ></Toolbar>
-      {view === 'table' ? (
+      {view === 'table' && !matches ? (
         <DataTable
           stripedRows
           value={filteredAppointment}
@@ -423,7 +413,8 @@ const Appointment = () => {
           />
         </DataTable>
       ) : (
-        <div className="grid grid-cols-4 gap-5">
+        <div className="grid lg:grid-cols-4
+        md:grid-cols-3 sm:grid-cols-2 grid-cols-1 gap-5">
           {filteredAppointment.map((appointment) => (
             <AppointmentCard key={appointment.id} {...appointment} />
           ))}

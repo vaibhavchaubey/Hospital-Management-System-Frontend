@@ -12,10 +12,12 @@ import type { User } from '../../types';
 import { useEffect, useState } from 'react';
 import { getUserProfile } from '../../Service/UserService';
 import useProtectedImage from '../Utility/Dropzone/useProtectedImage';
+import { useMediaQuery } from '@mantine/hooks';
 
 const ProfileMenu = () => {
   const user: User = useSelector((state: any) => state.user);
   const [profilePictureId, setProfilePictureId] = useState<string | null>(null);
+   const matches = useMediaQuery('(max-width: 768px)');
 
   useEffect(() => {
     if (!user) {
@@ -36,9 +38,11 @@ const ProfileMenu = () => {
     <Menu shadow="md" width={200}>
       <Menu.Target>
         <div className="flex items-center gap-3 cursor-pointer">
-          <span className="font-medium text-lg text-neutral-900">
-            {user.name}
-          </span>
+          {!matches && (
+            <span className="font-medium text-lg text-neutral-900">
+              {user.name}
+            </span>
+          )}
           <Avatar variant="filled" src={url} size={45} alt="it's me" />
         </div>
       </Menu.Target>

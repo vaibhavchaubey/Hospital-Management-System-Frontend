@@ -11,7 +11,7 @@ import {
 } from '@mantine/core';
 import { DateInput } from '@mantine/dates';
 import { useForm } from '@mantine/form';
-import { useDisclosure } from '@mantine/hooks';
+import { useDisclosure, useMediaQuery } from '@mantine/hooks';
 import { IconEdit } from '@tabler/icons-react';
 import { useEffect, useState } from 'react';
 import { useSelector } from 'react-redux';
@@ -119,7 +119,7 @@ const Profile = () => {
     } catch (error: any) {
       console.log(error);
       errorNotification(
-        error?.response?.data?.errorMessage || 'Update failed.'
+        error?.response?.data?.errorMessage || 'Update failed.',
       );
     } finally {
       setLoading(false);
@@ -127,13 +127,19 @@ const Profile = () => {
   };
 
   const url = useProtectedImage(profile.profilePictureId);
+  const matches = useMediaQuery('(max-width: 768px)');
 
   return (
-    <div className="p-10">
-      <div className="flex justify-between items-center">
+    <div className="md:p-10 p-5">
+      <div className="flex lg:flex-row flex-coljustify-between items-center">
         <div className="flex gap-5 items-center">
           <div className="flex flex-col items-center gap-3">
-            <Avatar variant="filled" src={url} size={150} alt="it's me" />
+            <Avatar
+              variant="filled"
+              src={url}
+              size={matches ? 120 : 150}
+              alt="it's me"
+            />
 
             {editMode && (
               <Button
@@ -147,16 +153,18 @@ const Profile = () => {
             )}
           </div>
           <div className="flex flex-col gap-3">
-            <div className="text-3xl font-medium text-neutral-900 capitalize">
+            <div className="md:text-3xl text-xl font-medium text-neutral-900 capitalize">
               {user.name}
             </div>
-            <div className="text-xl text-neutral-700">{user.email}</div>
+            <div className="md:text-xl text-lg text-neutral-700">
+              {user.email}
+            </div>
           </div>
         </div>
 
         {!editMode ? (
           <Button
-            size="lg"
+            size={matches ? 'sm' : 'lg'}
             variant="filled"
             type="button"
             leftSection={<IconEdit />}
@@ -166,7 +174,7 @@ const Profile = () => {
           </Button>
         ) : (
           <Button
-            size="lg"
+            size={matches ? 'sm' : 'lg'}
             variant="filled"
             type="submit"
             loading={loading}
@@ -191,26 +199,28 @@ const Profile = () => {
         >
           <Table.Tbody>
             <Table.Tr className="[&>tr]:!mb-3 [&_td]:!w-1/2">
-              <Table.Td className="font-semibold text-xl">
+              <Table.Td className="md:font-semibold md:text-xl font-medium text-lg">
                 Date of Birth
               </Table.Td>
               {editMode ? (
-                <Table.Td className="text-xl">
+                <Table.Td className="md:text-xl text-lg">
                   <DateInput
                     {...form.getInputProps('dob')}
                     placeholder="Date of birth"
                   />
                 </Table.Td>
               ) : (
-                <Table.Td className="text-xl">
+                <Table.Td className="md:text-xl text-lg">
                   {formatDate(profile.dob) ?? '-'}
                 </Table.Td>
               )}
             </Table.Tr>
             <Table.Tr>
-              <Table.Td className="font-semibold text-xl">Phone</Table.Td>
+              <Table.Td className="md:font-semibold md:text-xl font-medium text-lg">
+                Phone
+              </Table.Td>
               {editMode ? (
-                <Table.Td className="text-xl">
+                <Table.Td className="md:text-xl text-lg">
                   <NumberInput
                     {...form.getInputProps('phone')}
                     placeholder="Phone number"
@@ -220,28 +230,34 @@ const Profile = () => {
                   />
                 </Table.Td>
               ) : (
-                <Table.Td className="text-xl">{profile.phone ?? '-'}</Table.Td>
+                <Table.Td className="md:text-xl text-lg">
+                  {profile.phone ?? '-'}
+                </Table.Td>
               )}
             </Table.Tr>
             <Table.Tr>
-              <Table.Td className="font-semibold text-xl">Address</Table.Td>
+              <Table.Td className="md:font-semibold md:text-xl font-medium text-lg">
+                Address
+              </Table.Td>
               {editMode ? (
-                <Table.Td className="text-xl">
+                <Table.Td className="md:text-xl text-lg">
                   <TextInput
                     {...form.getInputProps('address')}
                     placeholder="Address"
                   />
                 </Table.Td>
               ) : (
-                <Table.Td className="text-xl">
+                <Table.Td className="md:text-xl text-lg">
                   {profile.address ?? '-'}
                 </Table.Td>
               )}
             </Table.Tr>
             <Table.Tr>
-              <Table.Td className="font-semibold text-xl">Aadhar No</Table.Td>
+              <Table.Td className="md:font-semibold md:text-xl font-medium text-lg">
+                Aadhar No
+              </Table.Td>
               {editMode ? (
-                <Table.Td className="text-xl">
+                <Table.Td className="md:text-xl text-lg">
                   <NumberInput
                     {...form.getInputProps('aadharNo')}
                     placeholder="Aadhar number"
@@ -251,15 +267,17 @@ const Profile = () => {
                   />
                 </Table.Td>
               ) : (
-                <Table.Td className="text-xl">
+                <Table.Td className="md:text-xl text-lg">
                   {profile.aadharNo ?? '-'}
                 </Table.Td>
               )}
             </Table.Tr>
             <Table.Tr>
-              <Table.Td className="font-semibold text-xl">Blood Group</Table.Td>
+              <Table.Td className="md:font-semibold md:text-xl font-medium text-lg">
+                Blood Group
+              </Table.Td>
               {editMode ? (
-                <Table.Td className="text-xl">
+                <Table.Td className="md:text-xl text-lg">
                   <Select
                     {...form.getInputProps('bloodGroup')}
                     placeholder="Blood group"
@@ -267,39 +285,41 @@ const Profile = () => {
                   />
                 </Table.Td>
               ) : (
-                <Table.Td className="text-xl">
+                <Table.Td className="md:text-xl text-lg">
                   {bloodGroup[profile.bloodGroup] ?? '-'}
                 </Table.Td>
               )}
             </Table.Tr>
             <Table.Tr>
-              <Table.Td className="font-semibold text-xl">Allergies</Table.Td>
+              <Table.Td className="md:font-semibold md:text-xl font-medium text-lg">
+                Allergies
+              </Table.Td>
               {editMode ? (
-                <Table.Td className="text-xl">
+                <Table.Td className="md:text-xl text-lg">
                   <TagsInput
                     {...form.getInputProps('allergies')}
                     placeholder="Allergies separated by commas"
                   />
                 </Table.Td>
               ) : (
-                <Table.Td className="text-xl">
+                <Table.Td className="md:text-xl text-lg">
                   {arrayToCSV(profile.allergies) ?? '-'}
                 </Table.Td>
               )}
             </Table.Tr>
             <Table.Tr>
-              <Table.Td className="font-semibold text-xl">
+              <Table.Td className="md:font-semibold md:text-xl font-medium text-lg">
                 Chronic Disease
               </Table.Td>
               {editMode ? (
-                <Table.Td className="text-xl">
+                <Table.Td className="md:text-xl text-lg">
                   <TagsInput
                     {...form.getInputProps('chronicDisease')}
                     placeholder="Chronic Diseases separated by commas"
                   />
                 </Table.Td>
               ) : (
-                <Table.Td className="text-xl">
+                <Table.Td className="md:text-xl text-lg">
                   {arrayToCSV(profile.chronicDisease) ?? '-'}
                 </Table.Td>
               )}

@@ -1,12 +1,16 @@
 import { Outlet } from 'react-router-dom';
 import Sidebar from '../Doctor/Sidebar/Sidebar';
 import Header from '../Header/Header';
+import { useMediaQuery } from '@mantine/hooks';
 
 const DoctorDashboard = () => {
+  const matches = useMediaQuery('(max-width: 768px)');
+
   return (
     <div>
       <div className="flex">
-        <Sidebar />
+        {!matches && <Sidebar />}
+
         <div className="w-full overflow-hidden flex flex-col">
           <Header />
           {/* This is where the main content will be rendered. The Outlet component will render the matched child route */}
