@@ -3,11 +3,17 @@ import {
   Button,
   Fieldset,
   NumberInput,
+  SegmentedControl,
   Select,
   TextInput,
 } from '@mantine/core';
 import { useForm } from '@mantine/form';
-import { IconEdit, IconSearch } from '@tabler/icons-react';
+import {
+  IconEdit,
+  IconLayoutGrid,
+  IconSearch,
+  IconTable,
+} from '@tabler/icons-react';
 import { FilterMatchMode } from 'primereact/api';
 import { Column } from 'primereact/column';
 import { DataTable, type DataTableFilterMeta } from 'primereact/datatable';
@@ -24,6 +30,9 @@ import {
 } from '../../../Utility/NotificationUtil';
 import { capitalizeFirstLetter } from '../../../Utility/OtherUtility';
 import { medicineCategories, medicineTypes } from '../../Data/DropdownData';
+import ReportCard from '../../Doctor/Appointment/ReportCard';
+import { Toolbar } from 'primereact/toolbar';
+import MedicineCard from './MedicineCard';
 
 type Medicine = {
   name: string;
@@ -38,6 +47,7 @@ type Medicine = {
 };
 
 const Medicine = () => {
+  const [view, setView] = useState('table');
   const [loading, setLoading] = useState(false);
   const [data, setData] = useState<any[]>([]);
 
@@ -126,7 +136,7 @@ const Medicine = () => {
     try {
       const res = await method(values);
       successNotification(
-        `Medicine ${update ? 'updated' : 'added'} successfully`
+        `Medicine ${update ? 'updated' : 'added'} successfully`,
       );
       form.reset();
       setEdit(false);
@@ -135,7 +145,7 @@ const Medicine = () => {
       console.error('Error creating report:', err);
       errorNotification(
         err?.response?.data?.errorMessage ||
-          `Failed to ${update ? 'update' : 'add'} medicine`
+          `Failed to ${update ? 'update' : 'add'} medicine`,
       );
     } finally {
       setLoading(false);
@@ -152,12 +162,26 @@ const Medicine = () => {
     );
   };
 
-  const renderHeader = () => {
+  const startToolbarTemplate = () => {
     return (
-      <div className="flex flex-wrap gap-2 justify-between items-center">
-        <Button variant="filled" onClick={() => setEdit(true)}>
-          Add Medicine
-        </Button>
+      <Button variant="filled" onClick={() => setEdit(true)}>
+        Add Medicine
+      </Button>
+    );
+  };
+
+  const rightToolbarTemplate = () => {
+    return (
+      <div className="flex flex-wrap gap-2 justify-end items-center">
+        <SegmentedControl
+          value={view}
+          onChange={setView}
+          color="primary"
+          data={[
+            { label: <IconTable />, value: 'table' },
+            { label: <IconLayoutGrid />, value: 'card' },
+          ]}
+        />
 
         <TextInput
           leftSection={<IconSearch />}
@@ -170,55 +194,80 @@ const Medicine = () => {
     );
   };
 
-  const header = renderHeader();
-
   return (
     <div>
       {!edit ? (
-        <DataTable
-          header={header}
-          stripedRows
-          value={data}
-          size="small"
-          paginator
-          rows={10}
-          paginatorTemplate="FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink CurrentPageReport RowsPerPageDropdown"
-          rowsPerPageOptions={[10, 25, 50]}
-          dataKey="id"
-          filterDisplay="menu"
-          globalFilterFields={['doctorName', 'notes']}
-          emptyMessage="No appointment found."
-          currentPageReportTemplate="Showing {first} to {last} of {totalRecords} entries"
-        >
-          <Column field="name" header="Name" />
-          <Column field="dosage" header="Dosage" />
-          <Column field="stock" header="Stock" />
-          <Column
-            field="category"
-            header="Category"
-            body={(rowData) => capitalizeFirstLetter(rowData.category)}
-          />
-          <Column
-            field="type"
-            header="Type"
-            body={(rowData) => capitalizeFirstLetter(rowData.type)}
-          />
-          <Column field="manufacturer" header="Manufacturer" />
-          <Column field="unitPrice" header="Unit Price (₹)" sortable />
+        <div>
+          <Toolbar
+            className="mb-4 !p-1"
+            start={startToolbarTemplate}
+            end={rightToolbarTemplate}
+          ></Toolbar>
+          {view === 'table' ? (
+            <DataTable
+              stripedRows
+              value={
+                <Button variant="filled" onClick={() => setEdit(true)}>
+                  Add Medicine
+                </Button>
+              }
+              size="small"
+              paginator
+              rows={10}
+              paginatorTemplate="FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink CurrentPageReport RowsPerPageDropdown"
+              rowsPerPageOptions={[10, 25, 50]}
+              dataKey="id"
+              filterDisplay="menu"
+              globalFilterFields={['doctorName', 'notes']}
+              emptyMessage="No appointment found."
+              currentPageReportTemplate="Showing {first} to {last} of {totalRecords} entries"
+            >
+              <Column field="name" header="Name" />
+              <Column field="dosage" header="Dosage" />
+              <Column field="stock" header="Stock" />
+              <Column
+                field="category"
+                header="Category"
+                body={(rowData) => capitalizeFirstLetter(rowData.category)}
+              />
+              <Column
+                field="type"
+                header="Type"
+                body={(rowData) => capitalizeFirstLetter(rowData.type)}
+              />
+              <Column field="manufacturer" header="Manufacturer" />
+              <Column field="unitPrice" header="Unit Price (₹)" sortable />
 
-          <Column
-            field="createdAt"
-            header="Creater Date"
-            sortable
-            body={(rowData) => formatDate(rowData.createdAt)}
-          />
+              <Column
+                field="createdAt"
+                header="Creater Date"
+                sortable
+                body={(rowData) => formatDate(rowData.createdAt)}
+              />
 
-          <Column
-            headerStyle={{ textAlign: 'center' }}
-            bodyStyle={{ textAlign: 'center', overflow: 'visible' }}
-            body={actionBodyTemplate}
-          />
-        </DataTable>
+              <Column
+                headerStyle={{ textAlign: 'center' }}
+                bodyStyle={{ textAlign: 'center', overflow: 'visible' }}
+                body={actionBodyTemplate}
+              />
+            </DataTable>
+          ) : (
+            <div className="grid grid-cols-4 gap-5">
+              {data.map((medicine) => (
+                <MedicineCard
+                  key={medicine.id}
+                  {...medicine}
+                  onEdit={() => onEdit(medicine)}
+                />
+              ))}
+              {data.length === 0 && (
+                <div className="col-span-4 text-center text-gray-500">
+                  No medicines found.
+                </div>
+              )}
+            </div>
+          )}
+        </div>
       ) : (
         <form onSubmit={form.onSubmit(handleSubmit)} className="grid gap-5">
           <Fieldset
