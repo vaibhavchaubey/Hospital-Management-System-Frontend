@@ -54,7 +54,7 @@ const LoginPage = () => {
           Pulse
         </span>
       </div>
-      <div className="w-[450px] backdrop-blur-md p-10 py-8 rounded-lg">
+      <div className="sm:w-[450px] w-[380px] backdrop-blur-md sm:p-10 p-4 py-8 rounded-lg">
         <form
           onSubmit={form.onSubmit(handleSubmit)}
           className="flex flex-col gap-5 [&_input]:!placeholder-neutral-100 [&_.mantine-Input-input]:!border-white [&_.mantine-Input-input]:!border [&_input]:!p-2 [&_svg]:!text-white [&_input]:!text-white"

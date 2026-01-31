@@ -36,6 +36,7 @@ import {
   successNotification,
 } from '../../../Utility/NotificationUtil';
 import InventoryCard from './InventoryCard';
+import { useMediaQuery } from '@mantine/hooks';
 
 const Inventory = () => {
   const [view, setView] = useState('table');
@@ -43,6 +44,7 @@ const Inventory = () => {
   const [data, setData] = useState<any[]>([]);
   const [medicine, setMedicine] = useState<any[]>([]);
   const [medicineMap, setMedicineMap] = useState<Record<string, any>>({});
+  const matches = useMediaQuery('(max-width: 768px)');
 
   const [edit, setEdit] = useState<boolean>(false);
 
@@ -204,10 +206,11 @@ const Inventory = () => {
 
   const rightToolbarTemplate = () => {
     return (
-      <div className="flex flex-wrap gap-2 justify-end items-center">
+      <div className="md:flex hidden flex-wrap gap-2 justify-end items-center">
         <SegmentedControl
           value={view}
           onChange={setView}
+          size={matches ? 'xs' : 'md'}
           color="primary"
           data={[
             { label: <IconTable />, value: 'table' },
@@ -216,6 +219,7 @@ const Inventory = () => {
         />
 
         <TextInput
+          className="lg:block hidden"
           leftSection={<IconSearch />}
           fw={500}
           value={globalFilterValue}
@@ -235,7 +239,7 @@ const Inventory = () => {
             start={startToolbarTemplate}
             end={rightToolbarTemplate}
           ></Toolbar>
-          {view === 'table' ? (
+          {view === 'table' && !matches ? (
             <DataTable
               stripedRows
               value={data}
@@ -283,7 +287,10 @@ const Inventory = () => {
               />
             </DataTable>
           ) : (
-            <div className="grid grid-cols-4 gap-5">
+            <div
+              className="grid lg:grid-cols-4
+        md:grid-cols-3 sm:grid-cols-2 grid-cols-1 gap-5"
+            >
               {data.map((inventory) => (
                 <InventoryCard
                   key={inventory.id}
@@ -303,7 +310,7 @@ const Inventory = () => {
       ) : (
         <form onSubmit={form.onSubmit(handleSubmit)} className="grid gap-5">
           <Fieldset
-            className="grid grid-cols-2 gap-4"
+            className="grid sm:grid-cols-2 gap-4"
             legend={
               <span className="text-lg font-medium text-primary-500">
                 Medicine information

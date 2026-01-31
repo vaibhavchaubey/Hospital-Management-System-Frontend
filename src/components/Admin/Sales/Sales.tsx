@@ -17,15 +17,20 @@ import {
   Title,
   type SelectProps,
 } from '@mantine/core';
-import { Spotlight, spotlight } from '@mantine/spotlight';
+import {
+  Spotlight,
+  spotlight,
+  type SpotlightActionData,
+} from '@mantine/spotlight';
 import { IconLayoutGrid, IconSearch, IconTable } from '@tabler/icons-react';
 
 import { useForm } from '@mantine/form';
-import { useDisclosure } from '@mantine/hooks';
+import { useDisclosure, useMediaQuery } from '@mantine/hooks';
 import { IconCheck, IconEye, IconPlus, IconTrash } from '@tabler/icons-react';
 import { FilterMatchMode } from 'primereact/api';
 import { Column } from 'primereact/column';
 import { DataTable, type DataTableFilterMeta } from 'primereact/datatable';
+import { Toolbar } from 'primereact/toolbar';
 import React, { useEffect, useState } from 'react';
 import {
   getAllPrescriptions,
@@ -43,7 +48,6 @@ import {
   successNotification,
 } from '../../../Utility/NotificationUtil';
 import { freqMap } from '../../Data/DropdownData';
-import { Toolbar } from 'primereact/toolbar';
 import SaleCard from './SaleCard';
 
 interface SaleItem {
@@ -64,7 +68,8 @@ const Sales = () => {
 
   const [edit, setEdit] = useState<boolean>(false);
 
-  const [actions, setActions] = useState<SpotlightAction[]>([]);
+  const [actions, setActions] = useState<SpotlightActionData[]>([]);
+  const matches = useMediaQuery('(max-width: 768px)');
 
   const [filters, setFilters] = useState<DataTableFilterMeta>({
     global: { value: null, matchMode: FilterMatchMode.CONTAINS },
@@ -327,10 +332,11 @@ const Sales = () => {
 
   const rightToolbarTemplate = () => {
     return (
-      <div className="flex flex-wrap gap-2 justify-end items-center">
+      <div className="md:flex hidden flex-wrap gap-2 justify-end items-center">
         <SegmentedControl
           value={view}
           onChange={setView}
+          size={matches ? 'xs' : 'md'}
           color="primary"
           data={[
             { label: <IconTable />, value: 'table' },
@@ -339,6 +345,7 @@ const Sales = () => {
         />
 
         <TextInput
+          className="lg:block hidden"
           leftSection={<IconSearch />}
           fw={500}
           value={globalFilterValue}
@@ -358,7 +365,7 @@ const Sales = () => {
             start={startToolbarTemplate}
             end={rightToolbarTemplate}
           ></Toolbar>
-          {view === 'table' ? (
+          {view === 'table' && !matches ? (
             <DataTable
               removableSort
               stripedRows
@@ -392,7 +399,10 @@ const Sales = () => {
               />
             </DataTable>
           ) : (
-            <div className="grid grid-cols-4 gap-5">
+            <div
+              className="grid lg:grid-cols-4
+        md:grid-cols-3 sm:grid-cols-2 grid-cols-1 gap-5"
+            >
               {data.map((sale) => (
                 <SaleCard
                   key={sale.id}
@@ -434,7 +444,7 @@ const Sales = () => {
               }
               radius="md"
             >
-              <div className="grid grid-cols-2 gap-5">
+              <div className="grid sm:grid-cols-2 gap-5">
                 <TextInput
                   label="Buyer Name"
                   placeholder="Enter buyer name"
@@ -459,7 +469,7 @@ const Sales = () => {
               }
               radius="md"
             >
-              <div className="grid grid-cols-5 gap-4">
+              <div className="grid sm:grid-cols-5 gap-4">
                 {form.values.saleItems.map((item, index) => (
                   <React.Fragment key={index}>
                     <div className="col-span-2">
@@ -570,7 +580,7 @@ const Sales = () => {
         }
         centered
       >
-        <div className="grid grid-cols-2 gap-5">
+        <div className="grid sm:grid-cols-2 gap-5">
           {saleItems?.map((saleItem: any, index: number) => (
             <Card key={index} shadow="sm" padding="lg" radius="md" withBorder>
               <Title order={4} mb="sm" className="capitalize">
