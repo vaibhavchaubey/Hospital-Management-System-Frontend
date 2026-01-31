@@ -32,6 +32,7 @@ import {
 import { capitalizeFirstLetter } from '../../../Utility/OtherUtility';
 import { medicineCategories, medicineTypes } from '../../Data/DropdownData';
 import MedicineCard from './MedicineCard';
+import { useMediaQuery } from '@mantine/hooks';
 
 type Medicine = {
   name: string;
@@ -51,7 +52,7 @@ const Medicine = () => {
   const [data, setData] = useState<any[]>([]);
 
   const [edit, setEdit] = useState<boolean>(false);
-
+  const matches = useMediaQuery('(max-width: 768px)');
   const [filters, setFilters] = useState<DataTableFilterMeta>({
     global: { value: null, matchMode: FilterMatchMode.CONTAINS },
   });
@@ -163,10 +164,11 @@ const Medicine = () => {
 
   const rightToolbarTemplate = () => {
     return (
-      <div className="flex flex-wrap gap-2 justify-end items-center">
+      <div className="md:flex hidden flex-wrap gap-2 justify-end items-center">
         <SegmentedControl
           value={view}
           onChange={setView}
+          size={matches ? 'xs' : 'md'}
           color="primary"
           data={[
             { label: <IconTable />, value: 'table' },
@@ -175,6 +177,7 @@ const Medicine = () => {
         />
 
         <TextInput
+          className="lg:block hidden"
           leftSection={<IconSearch />}
           fw={500}
           value={globalFilterValue}
@@ -189,8 +192,8 @@ const Medicine = () => {
     <div>
       {!edit ? (
         <div>
-          <Toolbar className="mb-4 !p-1" end={rightToolbarTemplate}></Toolbar>
-          {view === 'table' ? (
+          <Toolbar className="mb-4 !p-1 md:block hidden" end={rightToolbarTemplate}></Toolbar>
+          {view === 'table' && !matches ? (
             <DataTable
               stripedRows
               value={data}
@@ -229,7 +232,10 @@ const Medicine = () => {
               />
             </DataTable>
           ) : (
-            <div className="grid grid-cols-4 gap-5">
+            <div
+              className="grid lg:grid-cols-4
+        md:grid-cols-3 sm:grid-cols-2 grid-cols-1 gap-5"
+            >
               {data.map((medicine) => (
                 <MedicineCard key={medicine.id} {...medicine} />
               ))}

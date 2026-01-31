@@ -9,7 +9,7 @@ import {
   TextInput,
   Title,
 } from '@mantine/core';
-import { useDisclosure } from '@mantine/hooks';
+import { useDisclosure, useMediaQuery } from '@mantine/hooks';
 import {
   IconEye,
   IconLayoutGrid,
@@ -33,6 +33,7 @@ const Prescriptions = ({ appointment }: any) => {
   const [opened, { open, close }] = useDisclosure(false);
   const [medicinesData, setMedicinesData] = useState<any>([]);
   const navigate = useNavigate();
+  const matches = useMediaQuery('(max-width: 768px)');
 
   const [filters, setFilters] = useState<DataTableFilterMeta>({
     global: { value: null, matchMode: FilterMatchMode.CONTAINS },
@@ -88,10 +89,11 @@ const Prescriptions = ({ appointment }: any) => {
 
   const rightToolbarTemplate = () => {
     return (
-      <div className="flex flex-wrap gap-2 justify-end items-center">
+      <div className="md:flex hidden flex-wrap gap-5 justify-end items-center">
         <SegmentedControl
           value={view}
           onChange={setView}
+          size={matches ? 'xs' : 'md'}
           color="primary"
           data={[
             { label: <IconTable />, value: 'table' },
@@ -100,6 +102,7 @@ const Prescriptions = ({ appointment }: any) => {
         />
 
         <TextInput
+          className="lg:block hidden"
           leftSection={<IconSearch />}
           fw={500}
           value={globalFilterValue}
@@ -113,7 +116,7 @@ const Prescriptions = ({ appointment }: any) => {
   return (
     <div>
       <Toolbar className="mb-4 !p-1" end={rightToolbarTemplate}></Toolbar>
-      {view === 'table' ? (
+      {view === 'table' && !matches ? (
         <DataTable
           stripedRows
           value={data}
@@ -150,7 +153,10 @@ const Prescriptions = ({ appointment }: any) => {
           />
         </DataTable>
       ) : (
-        <div className="grid grid-cols-4 gap-5">
+        <div
+          className="grid lg:grid-cols-4
+        md:grid-cols-3 sm:grid-cols-2 grid-cols-1 gap-5"
+        >
           {data.map((prescription) => (
             <PrescriptionCard
               key={prescription.id}
@@ -176,7 +182,7 @@ const Prescriptions = ({ appointment }: any) => {
         }
         centered
       >
-        <div className="grid grid-cols-2 gap-5">
+        <div className="grid md:grid-cols-2 grid-cols-1 gap-5">
           {medicinesData?.map((medicine: any, index: number) => (
             <Card key={index} shadow="sm" padding="lg" radius="md" withBorder>
               <Title order={4} mb="sm" className="capitalize">

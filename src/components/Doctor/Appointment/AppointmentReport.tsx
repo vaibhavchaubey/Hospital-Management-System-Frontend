@@ -42,6 +42,7 @@ import {
 } from '../../Data/DropdownData';
 import { Toolbar } from 'primereact/toolbar';
 import ReportCard from './ReportCard';
+import { useMediaQuery } from '@mantine/hooks';
 
 type Medicine = {
   name: string;
@@ -63,7 +64,7 @@ const AppointmentReport = ({ appointment }: any) => {
   const [edit, setEdit] = useState<boolean>(false);
   const [medicine, setMedicine] = useState<any[]>([]);
   const [medicineMap, setMedicineMap] = useState<Record<string, any>>({});
-
+  const matches = useMediaQuery('(max-width: 768px)');
   const [filters, setFilters] = useState<DataTableFilterMeta>({
     global: { value: null, matchMode: FilterMatchMode.CONTAINS },
   });
@@ -278,10 +279,11 @@ const AppointmentReport = ({ appointment }: any) => {
 
   const rightToolbarTemplate = () => {
     return (
-      <div className="flex flex-wrap gap-2 justify-end items-center">
+      <div className="md:flex hidden flex-wrap gap-5 justify-end items-center">
         <SegmentedControl
           value={view}
           onChange={setView}
+          size={matches ? 'xs' : 'md'}
           color="primary"
           data={[
             { label: <IconTable />, value: 'table' },
@@ -290,6 +292,7 @@ const AppointmentReport = ({ appointment }: any) => {
         />
 
         <TextInput
+          className="lg:block hidden"
           leftSection={<IconSearch />}
           fw={500}
           value={globalFilterValue}
@@ -309,7 +312,7 @@ const AppointmentReport = ({ appointment }: any) => {
             start={startToolbarTemplate}
             end={rightToolbarTemplate}
           ></Toolbar>
-          {view === 'table' ? (
+          {view === 'table' && !matches ? (
             <DataTable
               stripedRows
               value={data}
@@ -347,7 +350,10 @@ const AppointmentReport = ({ appointment }: any) => {
               />
             </DataTable>
           ) : (
-            <div className="grid grid-cols-4 gap-5">
+            <div
+              className="grid lg:grid-cols-4
+        md:grid-cols-3 sm:grid-cols-2 grid-cols-1 gap-5"
+            >
               {data.map((report) => (
                 <ReportCard key={report.id} {...report} />
               ))}
@@ -389,12 +395,14 @@ const AppointmentReport = ({ appointment }: any) => {
 
             <TextInput
               {...form.getInputProps('diagnosis')}
+              className="col-span-2 sm:col-span-1"
               withAsterisk
               label="Diagnosis"
               placeholder="Enter diagnosis"
             />
             <TextInput
               {...form.getInputProps('refferal')}
+              className="col-span-2 sm:col-span-1"
               label="Refferal"
               placeholder="Enter refferal details"
             />
@@ -435,7 +443,7 @@ const AppointmentReport = ({ appointment }: any) => {
                       </ActionIcon>
                     </div>
                   }
-                  className="grid gap-4 col-span-2 grid-cols-2"
+                  className="grid gap-4 col-span-2 sm:grid-cols-2"
                 >
                   <Select
                     {...form.getInputProps(

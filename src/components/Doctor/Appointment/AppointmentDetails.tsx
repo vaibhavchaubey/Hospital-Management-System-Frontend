@@ -70,7 +70,7 @@ const AppointmentDetails = () => {
             </Badge>
           </Group>
 
-          <div className="grid grid-cols-2 gap-5 mb-2">
+          <div className="grid md:grid-cols-2 grid-cols-1 md:gap-5 gap-3 mb-2">
             <Text>
               <strong>Email:</strong> {appointment.patientEmail}
             </Text>
@@ -79,7 +79,7 @@ const AppointmentDetails = () => {
             </Text>
           </div>
 
-          <div className="grid grid-cols-2 gap-5 ">
+          <div className="grid md:grid-cols-2 grid-cols-1 md:gap-5 gap-3 mb-2">
             <Text>
               <strong>Reason:</strong> {appointment.reason}
             </Text>
@@ -96,14 +96,14 @@ const AppointmentDetails = () => {
           )}
         </Card>
 
-        <Tabs variant="pills" defaultValue="medical" my="md">
+        <Tabs variant="pills" defaultValue="prescriptions" my="md">
           <Tabs.List>
-            <Tabs.Tab
+            {/* <Tabs.Tab
               value="medical"
               leftSection={<IconStethoscope size={20} />}
             >
               Medical History
-            </Tabs.Tab>
+            </Tabs.Tab> */}
             <Tabs.Tab
               value="prescriptions"
               leftSection={<IconVaccine size={20} />}
