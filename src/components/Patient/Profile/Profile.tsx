@@ -131,7 +131,7 @@ const Profile = () => {
 
   return (
     <div className="md:p-10 p-5">
-      <div className="flex lg:flex-row flex-coljustify-between items-center">
+      <div className="flex lg:flex-row flex-col justify-between items-center">
         <div className="flex gap-5 items-center">
           <div className="flex flex-col items-center gap-3">
             <Avatar

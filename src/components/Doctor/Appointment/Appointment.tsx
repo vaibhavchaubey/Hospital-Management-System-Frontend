@@ -18,12 +18,11 @@ import React, { useEffect, useState } from 'react';
 import { TextInput } from '@mantine/core';
 import { DateTimePicker } from '@mantine/dates';
 import { useForm } from '@mantine/form';
-import { useDisclosure } from '@mantine/hooks';
+import { useDisclosure, useMediaQuery } from '@mantine/hooks';
 import { modals } from '@mantine/modals';
 import {
   IconEye,
   IconLayoutGrid,
-  IconPlus,
   IconSearch,
   IconTable,
   IconTrash,
@@ -31,6 +30,7 @@ import {
 import type { DataTableFilterMeta } from 'primereact/datatable';
 import { Toolbar } from 'primereact/toolbar';
 import { useSelector } from 'react-redux';
+import { useNavigate } from 'react-router-dom';
 import {
   cancelAppointment,
   getAppointmentsByDoctor,
@@ -51,7 +51,6 @@ import {
   successNotification,
 } from '../../../Utility/NotificationUtil';
 import { appointmentReasons } from '../../Data/DropdownData';
-import { useNavigate } from 'react-router-dom';
 import AppointmentCard from './AppointmentCard';
 
 const Appointment = () => {
@@ -61,6 +60,7 @@ const Appointment = () => {
   const [doctors, setDoctors] = useState<DocotrDropdownOption[]>([]);
   const [loading, setLoading] = useState(false);
   const [appointments, setAppointments] = useState<Appointment[]>([]);
+  const matches = useMediaQuery('(max-width: 768px)');
 
   const [tab, setTab] = useState<string>('Today');
 
@@ -164,24 +164,6 @@ const Appointment = () => {
     },
   });
 
-  const renderHeader = () => {
-    return (
-      <div className="flex flex-wrap gap-2 justify-between items-center">
-        <Button leftSection={<IconPlus />} onClick={open} variant="filled">
-          Schedule Appoinment
-        </Button>
-
-        <TextInput
-          leftSection={<IconSearch />}
-          fw={500}
-          value={globalFilterValue}
-          onChange={onGlobalFilterChange}
-          placeholder="Keyword Search"
-        />
-      </div>
-    );
-  };
-
   const statusBodyTemplate = (rowData: Appointment) => {
     return (
       <Tag value={rowData.status} severity={getSeverity(rowData.status)} />
@@ -237,8 +219,6 @@ const Appointment = () => {
     );
   };
 
-  const header = renderHeader();
-
   const handleSubmit = async (values: ScheduleAppointmentFormValues) => {
     console.log('Form Values:', values);
 
@@ -278,10 +258,11 @@ const Appointment = () => {
 
   const rightToolbarTemplate = () => {
     return (
-      <div className="flex gap-5 items-center">
+      <div className="md:flex hidden gap-5 items-center">
         <SegmentedControl
           value={view}
           onChange={setView}
+          size={matches ? 'xs' : 'md'}
           color="primary"
           data={[
             { label: <IconTable />, value: 'table' },
@@ -289,6 +270,7 @@ const Appointment = () => {
           ]}
         />
         <TextInput
+          className="lg:block hidden"
           leftSection={<IconSearch />}
           fw={500}
           value={globalFilterValue}
@@ -347,11 +329,11 @@ const Appointment = () => {
   return (
     <div className="card">
       <Toolbar
-        className="mb-4"
+        className="mb-4 md:p-3 p-1"
         start={leftToolbarTemplate}
         end={rightToolbarTemplate}
       ></Toolbar>
-      {view === 'table' ? (
+      {view === 'table' && !matches ? (
         <DataTable
           stripedRows
           value={filteredAppointment}
@@ -422,7 +404,10 @@ const Appointment = () => {
           />
         </DataTable>
       ) : (
-        <div className="grid grid-cols-4 gap-5">
+        <div
+          className="grid lg:grid-cols-4
+        md:grid-cols-3 sm:grid-cols-2 grid-cols-1 gap-5"
+        >
           {filteredAppointment.map((appointment) => (
             <AppointmentCard key={appointment.id} {...appointment} />
           ))}
