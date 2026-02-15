@@ -9,9 +9,7 @@ import { Tag } from 'primereact/tag';
 import { formatDateWithTime } from '../../../Utility/DateUtility';
 
 const AppointmentCard = ({
-  id,
   doctorName,
-  doctorId,
   notes,
   reason,
   status,

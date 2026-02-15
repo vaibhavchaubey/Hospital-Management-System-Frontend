@@ -1,13 +1,11 @@
 import { Avatar, Divider } from '@mantine/core';
-import { bloodGroupMap } from '../../Data/DropdownData';
 import {
-  IconBriefcase,
-  IconCalendar,
   IconCalendarHeart,
   IconMail,
   IconMapPin,
-  IconPhone,
+  IconPhone
 } from '@tabler/icons-react';
+import { bloodGroupMap } from '../../Data/DropdownData';
 
 interface PatientCardProps {
   id: number;
@@ -23,19 +21,15 @@ interface PatientCardProps {
 }
 
 const PatientCard = ({
-  id,
   name,
   email,
   dob,
   phone,
   address,
-  aadharNo,
   bloodGroup,
-  allergies,
-  chronicDisease,
 }: PatientCardProps) => {
   const getAge = (dob: string) => {
-    if(!dob) return "N/A";
+    if (!dob) return 'N/A';
     const birthDate = new Date(dob);
     const today = new Date();
     let age = today.getFullYear() - birthDate.getFullYear();
@@ -47,9 +41,7 @@ const PatientCard = ({
       age--;
     }
     return age.toString();
-  }
-
-
+  };
 
   return (
     <div className="border border-gray-200 p-4 flex flex-col gap-2 hover:bg-primary-50 transition duration-300 ease-in-out rounded-xl hover:shadow-[0_0_5px_1px_blue] !shadow-primary-500 cursor-pointer space-y-2">

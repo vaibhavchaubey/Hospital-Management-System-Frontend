@@ -8,7 +8,6 @@ import {
 } from '@tabler/icons-react';
 
 const MedicineCard = ({
-  id,
   name,
   dosage,
   manufacturer,

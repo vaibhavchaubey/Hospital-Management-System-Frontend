@@ -1,16 +1,13 @@
-import { Button } from '@mantine/core';
 import {
   IconClock,
-  IconMedicineSyrup,
   IconNote,
   IconQuestionMark,
-  IconUserHeart,
+  IconUserHeart
 } from '@tabler/icons-react';
 import { useNavigate } from 'react-router-dom';
 import { formatDate } from '../../../Utility/DateUtility';
 
 const ReportCard = ({
-  id,
   appointmentId,
   doctorName,
   notes,

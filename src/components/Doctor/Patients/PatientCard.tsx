@@ -1,13 +1,11 @@
 import { Avatar, Divider } from '@mantine/core';
-import { bloodGroupMap } from '../../Data/DropdownData';
 import {
-  IconBriefcase,
-  IconCalendar,
   IconCalendarHeart,
   IconMail,
   IconMapPin,
-  IconPhone,
+  IconPhone
 } from '@tabler/icons-react';
+import { bloodGroupMap } from '../../Data/DropdownData';
 
 interface PatientCardProps {
   id: number;
@@ -23,16 +21,12 @@ interface PatientCardProps {
 }
 
 const PatientCard = ({
-  id,
   name,
   email,
   dob,
   phone,
   address,
-  aadharNo,
   bloodGroup,
-  allergies,
-  chronicDisease,
 }: PatientCardProps) => {
   const getAge = (dob: string) => {
     if(!dob) return "N/A";

@@ -1,12 +1,11 @@
 import React, { Suspense } from 'react';
 import { BrowserRouter, Route, Routes } from 'react-router-dom';
-import PublicRoute from './PublicRoute';
 import ProtectedRoute from './ProtectedRoute';
+import PublicRoute from './PublicRoute';
 
 const AdminDashboard = React.lazy(
   () => import('../components/Layout/AdminDashboard'),
 );
-const Random = React.lazy(() => import('../components/Random'));
 const LoginPage = React.lazy(() => import('../pages/LoginPage'));
 const RegisterPage = React.lazy(() => import('../pages/RegisterPage'));
 const PatientDashboard = React.lazy(

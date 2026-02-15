@@ -1,15 +1,11 @@
-import { ActionIcon, Button } from '@mantine/core';
-import {
-  IconBellRinging,
-  IconLayoutSidebarLeftCollapseFilled,
-} from '@tabler/icons-react';
+import { Button } from '@mantine/core';
+import { useMediaQuery } from '@mantine/hooks';
 import { useDispatch, useSelector } from 'react-redux';
 import { Link } from 'react-router-dom';
-import ProfileMenu from './ProfileMenu';
-import { removeUser } from '../../Slices/UserSlice';
 import { removeJwt } from '../../Slices/JwtSlice';
+import { removeUser } from '../../Slices/UserSlice';
 import SideDrawer from '../SideDrawer/SideDrawer';
-import { useMediaQuery } from '@mantine/hooks';
+import ProfileMenu from './ProfileMenu';
 
 const Header = () => {
   const dispatch = useDispatch();

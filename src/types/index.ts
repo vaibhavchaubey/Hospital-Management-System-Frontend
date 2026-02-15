@@ -63,7 +63,7 @@ export interface ScheduleAppointmentFormValues {
 
 export type AppointmentStatus = 'SCHEDULED' | 'CANCELLED' | 'COMPLETED';
 
-export interface Appointment {
+export interface AppointmentModel {
   id: number;
   patientId: number;
   patientName: string | null;

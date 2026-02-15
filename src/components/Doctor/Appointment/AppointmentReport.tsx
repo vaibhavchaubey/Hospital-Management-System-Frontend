@@ -161,7 +161,7 @@ const AppointmentReport = ({ appointment }: any) => {
       dosage: '',
       frequency: '',
       duration: 0,
-      route: '',
+      // route: '',
       type: '',
       instructions: '',
     });
@@ -191,7 +191,7 @@ const AppointmentReport = ({ appointment }: any) => {
 
     setLoading(true);
     try {
-      const res = await createAppointmentReport(data);
+      await createAppointmentReport(data);
 
       successNotification('Report created successfully');
       form.reset();
@@ -207,7 +207,7 @@ const AppointmentReport = ({ appointment }: any) => {
     }
   };
 
-  const actionBodyTemplate = (rowData: any) => {
+  const actionBodyTemplate = () => {
     return (
       <div className="flex gap-2">
         {/* <ActionIcon
@@ -261,9 +261,9 @@ const AppointmentReport = ({ appointment }: any) => {
       );
     } else {
       form.setFieldValue(`prescription.medicines.${index}.medicineId`, 'OTHER');
-      form.setFieldValue(`prescription.medicines.${index}.name`, null);
-      form.setFieldValue(`prescription.medicines.${index}.dosage`, null);
-      form.setFieldValue(`prescription.medicines.${index}.type`, null);
+      form.setFieldValue(`prescription.medicines.${index}.name`, '');
+      form.setFieldValue(`prescription.medicines.${index}.dosage`, '');
+      form.setFieldValue(`prescription.medicines.${index}.type`, '');
     }
   };
 

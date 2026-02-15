@@ -91,7 +91,7 @@ const Profile = () => {
     setEditMode(true);
   };
 
-  const handleSubmit = async (e: any) => {
+  const handleSubmit = async () => {
     form.validate();
     if (!form.isValid()) return;
     const values = form.getValues();

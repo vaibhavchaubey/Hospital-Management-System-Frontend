@@ -1,18 +1,17 @@
 import {
-  ActionIcon,
   Button,
   Fieldset,
   NumberInput,
   SegmentedControl,
   Select,
-  TextInput,
+  TextInput
 } from '@mantine/core';
 import { useForm } from '@mantine/form';
+import { useMediaQuery } from '@mantine/hooks';
 import {
-  IconEdit,
   IconLayoutGrid,
   IconSearch,
-  IconTable,
+  IconTable
 } from '@tabler/icons-react';
 import { FilterMatchMode } from 'primereact/api';
 import { Column } from 'primereact/column';
@@ -32,7 +31,6 @@ import {
 import { capitalizeFirstLetter } from '../../../Utility/OtherUtility';
 import { medicineCategories, medicineTypes } from '../../Data/DropdownData';
 import MedicineCard from './MedicineCard';
-import { useMediaQuery } from '@mantine/hooks';
 
 type Medicine = {
   name: string;
@@ -109,19 +107,6 @@ const Medicine = () => {
     setEdit(false);
   };
 
-  const onEdit = (rowData: any) => {
-    setEdit(true);
-    form.setValues({
-      ...rowData,
-      name: rowData.name,
-      dosage: rowData.dosage,
-      category: rowData.category,
-      type: rowData.type,
-      manufacturer: rowData.manufacturer,
-      unitPrice: rowData.unitPrice,
-    });
-  };
-
   const handleSubmit = async (values: any) => {
     let update = false;
     let method;
@@ -134,7 +119,7 @@ const Medicine = () => {
 
     setLoading(true);
     try {
-      const res = await method(values);
+      await method(values);
       successNotification(
         `Medicine ${update ? 'updated' : 'added'} successfully`,
       );
@@ -152,15 +137,6 @@ const Medicine = () => {
     }
   };
 
-  const actionBodyTemplate = (rowData: any) => {
-    return (
-      <div className="flex gap-2">
-        <ActionIcon onClick={() => onEdit(rowData)}>
-          <IconEdit size={20} stroke={1.5} />
-        </ActionIcon>
-      </div>
-    );
-  };
 
   const rightToolbarTemplate = () => {
     return (

@@ -8,6 +8,7 @@ import {
   TextInput,
 } from '@mantine/core';
 import { useForm } from '@mantine/form';
+import { useMediaQuery } from '@mantine/hooks';
 import {
   IconEdit,
   IconLayoutGrid,
@@ -17,6 +18,7 @@ import {
 import { FilterMatchMode } from 'primereact/api';
 import { Column } from 'primereact/column';
 import { DataTable, type DataTableFilterMeta } from 'primereact/datatable';
+import { Toolbar } from 'primereact/toolbar';
 import { useEffect, useState } from 'react';
 import {
   addMedicine,
@@ -30,10 +32,7 @@ import {
 } from '../../../Utility/NotificationUtil';
 import { capitalizeFirstLetter } from '../../../Utility/OtherUtility';
 import { medicineCategories, medicineTypes } from '../../Data/DropdownData';
-import ReportCard from '../../Doctor/Appointment/ReportCard';
-import { Toolbar } from 'primereact/toolbar';
 import MedicineCard from './MedicineCard';
-import { useMediaQuery } from '@mantine/hooks';
 
 type Medicine = {
   name: string;
@@ -136,7 +135,7 @@ const Medicine = () => {
 
     setLoading(true);
     try {
-      const res = await method(values);
+      await method(values);
       successNotification(
         `Medicine ${update ? 'updated' : 'added'} successfully`,
       );

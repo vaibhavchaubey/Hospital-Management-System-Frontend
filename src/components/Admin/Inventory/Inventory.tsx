@@ -138,7 +138,7 @@ const Inventory = () => {
 
     setLoading(true);
     try {
-      const res = await method(values);
+      await method(values);
       successNotification(`Stock ${update ? 'updated' : 'added'} successfully`);
       form.reset();
       setEdit(false);

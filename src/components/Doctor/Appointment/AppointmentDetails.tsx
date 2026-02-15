@@ -9,8 +9,7 @@ import {
 } from '@mantine/core';
 import {
   IconClipboardHeart,
-  IconStethoscope,
-  IconVaccine,
+  IconVaccine
 } from '@tabler/icons-react';
 import { useEffect, useState } from 'react';
 import { Link, useParams } from 'react-router-dom';

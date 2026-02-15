@@ -1,6 +1,5 @@
 import {
   ActionIcon,
-  Badge,
   Button,
   Card,
   Divider,
@@ -15,7 +14,7 @@ import {
   Text,
   TextInput,
   Title,
-  type SelectProps,
+  type SelectProps
 } from '@mantine/core';
 import {
   Spotlight,
@@ -158,16 +157,16 @@ const Sales = () => {
     setEdit(false);
   };
 
-  const onEdit = (rowData: any) => {
-    setEdit(true);
-    form.setValues({
-      ...rowData,
-      medicineId: rowData.medicineId ? String(rowData.medicineId) : '',
-      batchNo: rowData.batchNo,
-      quantity: rowData.quantity,
-      expiryDate: new Date(rowData.expiryDate),
-    });
-  };
+  // const onEdit = (rowData: any) => {
+  //   setEdit(true);
+  //   form.setValues({
+  //     ...rowData,
+  //     medicineId: rowData.medicineId ? String(rowData.medicineId) : '',
+  //     batchNo: rowData.batchNo,
+  //     quantity: rowData.quantity,
+  //     expiryDate: new Date(rowData.expiryDate),
+  //   });
+  // };
 
   const handleDetails = (rowData: any) => {
     open();
@@ -214,7 +213,7 @@ const Sales = () => {
     );
 
     try {
-      const res = await addSales({
+      await addSales({
         ...values,
         saleItems,
         totalAmount,
@@ -266,14 +265,14 @@ const Sales = () => {
     </Group>
   );
 
-  const statusBody = (rowData: any) => {
-    const isExpired = new Date(rowData.expiryDate) < new Date();
-    return (
-      <Badge color={isExpired ? 'red' : 'green'}>
-        {isExpired ? 'Expired' : 'Active'}
-      </Badge>
-    );
-  };
+  // const statusBody = (rowData: any) => {
+  //   const isExpired = new Date(rowData.expiryDate) < new Date();
+  //   return (
+  //     <Badge color={isExpired ? 'red' : 'green'}>
+  //       {isExpired ? 'Expired' : 'Active'}
+  //     </Badge>
+  //   );
+  // };
 
   // const actions: SpotlightActionData[] = [
   //   {

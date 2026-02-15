@@ -1,18 +1,18 @@
-import { Menu, Button, Text, Avatar } from '@mantine/core';
-import {
-  IconSettings,
-  IconSearch,
-  IconPhoto,
-  IconMessageCircle,
-  IconTrash,
-  IconArrowsLeftRight,
-} from '@tabler/icons-react';
-import { useSelector } from 'react-redux';
-import type { User } from '../../types';
-import { useEffect, useState } from 'react';
-import { getUserProfile } from '../../Service/UserService';
-import useProtectedImage from '../Utility/Dropzone/useProtectedImage';
+import { Avatar, Menu, Text } from '@mantine/core';
 import { useMediaQuery } from '@mantine/hooks';
+import {
+  IconArrowsLeftRight,
+  IconMessageCircle,
+  IconPhoto,
+  IconSearch,
+  IconSettings,
+  IconTrash,
+} from '@tabler/icons-react';
+import { useEffect, useState } from 'react';
+import { useSelector } from 'react-redux';
+import { getUserProfile } from '../../Service/UserService';
+import type { User } from '../../types';
+import useProtectedImage from '../Utility/Dropzone/useProtectedImage';
 
 const ProfileMenu = () => {
   const user: User = useSelector((state: any) => state.user);

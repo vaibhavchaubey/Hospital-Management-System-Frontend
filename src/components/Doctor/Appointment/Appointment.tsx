@@ -38,7 +38,7 @@ import {
 } from '../../../Service/AppointmentService';
 import { getDoctorDropdowns } from '../../../Service/DoctorProfileService';
 import type {
-  Appointment,
+  AppointmentModel,
   DocotrDropdownOption,
   Doctor,
   ScheduleAppointmentFormValues,
@@ -56,10 +56,10 @@ import AppointmentCard from './AppointmentCard';
 const Appointment = () => {
   const navigate = useNavigate();
   const [view, setView] = useState('table');
-  const [opened, { open, close }] = useDisclosure(false);
+  const [opened, { close }] = useDisclosure(false);
   const [doctors, setDoctors] = useState<DocotrDropdownOption[]>([]);
   const [loading, setLoading] = useState(false);
-  const [appointments, setAppointments] = useState<Appointment[]>([]);
+  const [appointments, setAppointments] = useState<AppointmentModel[]>([]);
   const matches = useMediaQuery('(max-width: 768px)');
 
   const [tab, setTab] = useState<string>('Today');
@@ -113,7 +113,7 @@ const Appointment = () => {
   const fetchAppointmentsData = async () => {
     try {
       // ✅ Fetch appointments
-      const appointmentsData: Appointment[] = await getAppointmentsByDoctor(
+      const appointmentsData: AppointmentModel[] = await getAppointmentsByDoctor(
         user.profileId,
       );
       setAppointments(appointmentsData);
@@ -164,13 +164,13 @@ const Appointment = () => {
     },
   });
 
-  const statusBodyTemplate = (rowData: Appointment) => {
+  const statusBodyTemplate = (rowData: AppointmentModel) => {
     return (
       <Tag value={rowData.status} severity={getSeverity(rowData.status)} />
     );
   };
 
-  const handleDelete = (rowData: Appointment) => {
+  const handleDelete = (rowData: AppointmentModel) => {
     modals.openConfirmModal({
       title: (
         <span className="text-xl font-serif font-semibold">Are You sure</span>
@@ -206,7 +206,7 @@ const Appointment = () => {
     });
   };
 
-  const actionBodyTemplate = (rowData: Appointment) => {
+  const actionBodyTemplate = (rowData: AppointmentModel) => {
     return (
       <div className="flex gap-2">
         <ActionIcon onClick={() => navigate('' + rowData.id)}>
@@ -252,7 +252,7 @@ const Appointment = () => {
     }
   };
 
-  const timeTemplate = (rowData: Appointment) => {
+  const timeTemplate = (rowData: AppointmentModel) => {
     return <span>{formatDateWithTime(rowData.appointmentTime)}</span>;
   };
 
@@ -361,7 +361,7 @@ const Appointment = () => {
             field="patientPhone"
             header="Phone"
             style={{ minWidth: '14rem' }}
-            body={(rowData: Appointment) =>
+            body={(rowData: AppointmentModel) =>
               rowData.patientPhone ? rowData.patientPhone : '-'
             }
           />

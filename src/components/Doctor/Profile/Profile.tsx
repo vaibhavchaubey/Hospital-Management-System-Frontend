@@ -28,15 +28,6 @@ import { formatDate } from '../../../Utility/DateUtility';
 import useProtectedImage from '../../Utility/Dropzone/useProtectedImage';
 import DropzoneButton from '../../Utility/Dropzone/DropzoneButton';
 
-const doctor = {
-  dob: '1985-04-15',
-  phone: '+91-9876543210',
-  address: '123 Green Avenue, Sector 45, New Delhi, India',
-  licenseNo: 'MEDL-56789',
-  specialization: 'Cardiology',
-  department: 'Cardiology',
-  totalExp: 12,
-};
 
 const Profile = () => {
   const user: User = useSelector((state: any) => state.user);
@@ -89,7 +80,7 @@ const Profile = () => {
     setEditMode(true);
   };
 
-  const handleSubmit = async (e: any) => {
+  const handleSubmit = async () => {
     form.validate();
     if (!form.isValid()) return;
     const values = form.getValues();

@@ -9,10 +9,8 @@ import {
 import { formatDate } from '../../../Utility/DateUtility';
 
 const InventoryCard = ({
-  id,
   medicineId,
   quantity,
-  initialQuantity,
   status,
   batchNo,
   expiryDate,

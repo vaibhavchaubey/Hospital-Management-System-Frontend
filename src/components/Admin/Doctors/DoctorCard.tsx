@@ -1,11 +1,9 @@
 import { Avatar, Divider } from '@mantine/core';
-import { bloodGroupMap } from '../../Data/DropdownData';
 import {
   IconBriefcase,
-  IconLicense,
   IconMail,
   IconMapPin,
-  IconPhone,
+  IconPhone
 } from '@tabler/icons-react';
 
 interface DoctorCardProps {
@@ -22,13 +20,10 @@ interface DoctorCardProps {
 }
 
 const DoctorCard = ({
-  id,
   name,
   email,
-  dob,
   phone,
   address,
-  licenseNo,
   specialization,
   department,
   totalExp,
