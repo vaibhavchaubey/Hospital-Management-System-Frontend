@@ -90,6 +90,14 @@ const AppRoutes = () => {
             }
           />
           <Route
+            path="/register"
+            element={
+              <PublicRoute>
+                <RegisterPage />
+              </PublicRoute>
+            }
+          />
+          <Route
             path="/admin"
             element={
               <ProtectedRoute>
