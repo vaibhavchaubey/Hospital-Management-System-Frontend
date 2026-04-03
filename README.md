@@ -1,158 +1,306 @@
-# Hospital Management System Frontend
+# Hospital Management System - Frontend
 
-[![License](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
-[![npm version](https://img.shields.io/badge/v-0.0.0-brightgreen)](https://github.com/vaibhavchaubey/Hospital-Management-System-Frontend)
-[![Build Status](https://img.shields.io/badge/build-unknown-lightgrey)](#)
+[![React](https://img.shields.io/badge/React-19.2.0-61dafb)](https://react.dev/)
+[![TypeScript](https://img.shields.io/badge/TypeScript-5.8-3178c6)](https://www.typescriptlang.org/)
+[![Vite](https://img.shields.io/badge/Vite-7.0-646cff)](https://vitejs.dev/)
+[![Redux](https://img.shields.io/badge/Redux%20Toolkit-2.8-764abc)](https://redux-toolkit.js.org/)
+[![Mantine UI](https://img.shields.io/badge/Mantine%20UI-8.3-339af0)](https://mantine.dev/)
+[![Tailwind CSS](https://img.shields.io/badge/Tailwind%20CSS-4.1-06b6d4)](https://tailwindcss.com/)
+[![Node.js](https://img.shields.io/badge/Node.js-18%2B-339933)](https://nodejs.org/)
 
-> React + TypeScript + Vite frontend for a Hospital Management System, supporting Admin, Doctor, and Patient roles.
+## 🚀 What the Project Does
 
-## 🚀 What the project does
+**Hospital Management System (HMS) Frontend** is a comprehensive React + TypeScript SPA that provides role-based dashboards for hospital staff, doctors, and patients. It serves as the primary user interface for a microservices-based hospital management ecosystem, enabling appointment scheduling, patient & doctor profile management, medicine inventory tracking, sales management, and medical record organization. The frontend communicates with multiple Spring Boot microservices through a centralized API Gateway, featuring real-time dashboards, charts, and notifications for streamlined healthcare operations.
 
-A single-page application (SPA) with role-based dashboards and CRUD flows for hospital workflows:
+## 💡 Why the Project is Useful
 
-- Admin: Inventory, Medicines, Patients, Doctors, Sales, dashboard analytics
-- Doctor: Appointments, patient list, profile, pharmacy, appointment details
-- Patient: Book appointments, view profile, appointment history
-- Shared: JWT auth, protected routes, API integration via `axios`
+- **Role-Based Dashboards**: Dedicated interfaces for Admin, Doctor, and Patient roles with tailored workflows and permissions.
+- **Comprehensive Hospital Management**: Manage appointments, patient profiles, doctor credentials, medicines, inventory, and sales—all from one integrated platform.
+- **Real-Time Analytics**: Visual dashboards with charts and metrics for monitoring hospital operations, patient visits, and pharmacy sales.
+- **Seamless Microservices Integration**: Consumes APIs from 7 backend microservices via a centralized API Gateway, maintaining clean separation of concerns.
+- **Professional UI/UX**: Built with Mantine UI and PrimeReact for modern, accessible, and responsive user interfaces.
+- **Type-Safe Development**: Full TypeScript support ensures maintainability and catches errors at compile time.
+- **Redux State Management**: Centralized state management for JWT tokens, user profiles, and application data.
 
-## 🌟 Why this project is useful
+## ✨ Key Features
 
-- Modular role-based UX for health operations
-- Responsive dashboard with charts and key metrics
-- Reusable service layer (`src/Service/*`) and centralized API interceptor (`src/Interceptor/AxiosInterceptor.tsx`)
-- Consistent UI with Mantine, PrimeReact, Tailwind
-- Redux Toolkit state management for JWT/profile data
+- **Implemented Admin Dashboard**: View hospital analytics, manage doctors, patients, appointments, medicine inventory, and sales with comprehensive charts and metrics.
+- **Built Doctor Portal**: Doctors can view appointments, manage patient records, access medicine information, and update their profiles.
+- **Designed Patient Dashboard**: Patients can schedule and track appointments, view their profiles, and access medical history.
+- **Optimized Appointment Scheduling**: Integrated appointment management with real-time updates and conflict detection.
+- **Medicine Inventory Management**: Track medicine stock, categories, dosages, and pricing with sales transaction recording.
+- **Secure Authentication**: JWT-based login/registration with role-based access control and protected routes.
+- **Responsive Design**: Mobile-friendly interface using Tailwind CSS and Mantine responsive components.
+- **Real-Time Notifications**: Toast notifications for user actions, errors, and system updates via Mantine Notifications.
+- **File Upload Support**: Dropzone integration for profile picture uploads and media management.
+- **Advanced Filtering & Sorting**: Dynamic dropdowns and data filtering across all modules.
 
-## 🧩 Tech stack
+## 🛠️ Tech Stack
 
-- TypeScript + React 19
-- Vite 7
-- Mantine (UI), PrimeReact (tables), Recharts (charts)
-- React Router DOM 7 (lazy routes)
-- Redux Toolkit + React Redux
-- Axios with interceptors
-- Tailwind CSS
+### Frontend
 
-## 📁 Project structure
+- **Framework**: React 19.2
+- **Language**: TypeScript 5.8
+- **Build Tool**: Vite 7.0
+- **State Management**: Redux Toolkit 2.8
+- **UI Frameworks**:
+  - Mantine UI 8.3 (Components, Hooks, Dates, Form, Modals, Dropzone, Charts, Notifications, Spotlight)
+  - PrimeReact 10.9 (Additional premium components)
+  - Tailwind CSS 4.1
+- **Routing**: React Router DOM 7.6
+- **HTTP Client**: Axios 1.10
+- **Charts**: Recharts 3.6, Mantine Charts
+- **Icons**: Tabler Icons React 3.34
+- **Utilities**:
+  - JWT Decode 4.0 (Token decoding)
+  - Day.js 1.11 (Date manipulation)
+  - PrimeIcons 7.0 (Icon library)
 
-- `src/components`: UI components grouped by admin/doctor/patient modules
-- `src/pages`: page views and route endpoints
-- `src/Routes`: `AppRoutes`, `ProtectedRoute`, `PublicRoute`
-- `src/Service`: API service functions
-- `src/Interceptor`: global axios configuration
-- `src/Slices`: redux slices (`JwtSlice`, `ProfileSlice`, `UserSlice`)
+### DevOps / Tools
 
-## 🛠️ Getting started
+- **Package Manager**: npm
+- **Linter**: ESLint 9.29
+- **Plugin**: Vite React Plugin / Tailwind CSS Vite Plugin
+- **Node.js**: 18+ required
 
-### Prerequisites
+## ⚙️ Getting Started (Installation & Setup)
 
-- Node.js 18+ / npm 10+
-- Backend API running and available via env variable `VITE_API_URL` (default: `http://localhost:9000`)
+### 1. Clone the Repository
 
-### Install
+```bash
+git clone https://github.com/vaibhavchaubey/Hospital-Management-System-Frontend.git
+cd Hospital-Management-System-Frontend
+```
+
+### 2. Install Dependencies
 
 ```bash
 npm install
 ```
 
-### Environment configuration
+### 3. Configure Environment Variables
 
-Copy `.env.example` to `.env` and set the backend API URL:
+Create a `.env` file in the root directory by copying `.env.example`:
 
 ```bash
 cp .env.example .env
 ```
 
-Example `.env`:
+Then update `.env` with your configuration:
 
-```ini
+```env
 VITE_API_URL=http://localhost:9000
 ```
 
-### Run locally
+**API Gateway URL**: Points to the API Gateway microservice (default: `http://localhost:9000`)
+
+### 4. Run Development Server
 
 ```bash
 npm run dev
 ```
 
-Open `http://localhost:5173` (or output URL).
+The frontend starts on `http://localhost:5173` by default. Open your browser and navigate to the application.
 
-### Build for production
+### 5. Build for Production
 
 ```bash
 npm run build
 ```
 
-Preview build output:
+Generates optimized production bundle in the `dist/` directory.
+
+### 6. Preview Production Build
 
 ```bash
 npm run preview
 ```
 
-### Scripts
+### 7. Lint Code
 
-- `npm run dev`: start dev server
-- `npm run build`: compile TypeScript + build static assets
-- `npm run preview`: local preview of production build
-- `npm run lint`: ESLint checks
+```bash
+npm run lint
+```
 
-## 🔐 Authentication and routes
+Runs ESLint to check for code quality and style issues.
 
-- Public: `/`, `/register`, `/login`
-- Admin: `/admin/**` (dashboard, medicine, inventory, sales, patients, doctors)
-- Doctor: `/doctor/**` (dashboard, profile, pharmacy, patients, appointments)
-- Patient: `/patient/**` (dashboard, profile, appointments)
-- Fallback: `*` -> NotFound
+## 🏗️ Project Structure
 
-`ProtectedRoute` checks Redux `state.jwt`; redirects unauthenticated users to `/login`.
+```
+src/
+├── App.tsx                    # Root component
+├── main.tsx                   # Entry point
+├── store.ts                   # Redux store configuration
+├── index.css                  # Global styles
+├── global.d.ts                # Global type definitions
+├── vite-env.d.ts              # Vite environment types
+├── components/
+│   ├── Admin/                 # Admin dashboard components
+│   │   ├── Dashboard/
+│   │   ├── Doctors/
+│   │   ├── Patients/
+│   │   ├── Appointments/
+│   │   ├── Medicines/
+│   │   ├── Inventory/
+│   │   ├── Sales/
+│   │   └── Sidebar/
+│   ├── Doctor/                # Doctor portal components
+│   │   ├── Dashboard/
+│   │   ├── Appointment/
+│   │   ├── Patients/
+│   │   ├── Medicine/
+│   │   ├── Profile/
+│   │   └── Sidebar/
+│   ├── Patient/               # Patient dashboard components
+│   │   ├── Dashboard/
+│   │   ├── Appointment/
+│   │   ├── Profile/
+│   │   └── Sidebar/
+│   ├── Header/                # Navigation header & profile menu
+│   ├── Layout/                # Role-based layout components
+│   ├── SideDrawer/            # Mobile drawer navigation
+│   ├── Utility/               # Utility components (Dropzone, etc.)
+│   ├── Data/                  # Mock data & dropdown data
+│   └── Interceptor/           # Axios interceptors
+├── pages/
+│   ├── LoginPage.tsx
+│   ├── RegisterPage.tsx
+│   ├── NotFoundPage.tsx
+│   ├── Admin/                 # Admin page routes
+│   ├── Doctor/                # Doctor page routes
+│   └── Patient/               # Patient page routes
+├── Routes/
+│   ├── AppRoutes.tsx          # Main route configuration
+│   ├── ProtectedRoute.tsx     # Protected route wrapper
+│   └── PublicRoute.tsx        # Public route wrapper
+├── Service/                   # API service modules
+│   ├── UserService.ts
+│   ├── ProfileService.ts
+│   ├── AppointmentService.ts
+│   ├── MedicineService.ts
+│   ├── InventoryService.ts
+│   ├── SalesService.ts
+│   ├── MediaService.ts
+│   └── ...
+├── Slices/                    # Redux slices (reducers)
+│   ├── JwtSlice.ts
+│   ├── UserSlice.ts
+│   └── ProfileSlice.ts
+├── types/
+│   └── index.ts               # TypeScript type definitions
+└── Utility/                   # Utility functions
+    ├── DateUtility.ts
+    ├── NotificationUtil.tsx
+    └── OtherUtility.ts
+```
 
-## 🧩 API integration details
+## 🌐 Backend Microservices
 
-Uses base URL from `src/Interceptor/AxiosInterceptor.tsx`:
+The frontend consumes APIs from the following microservices. Each service has its own dedicated repository with detailed documentation:
 
-- `VITE_API_URL` environment variable
-- JWT injection into `Authorization` header
-- 401 intercept handles token expiry
+### 1. Gateway Microservice
 
-Service examples:
+Acts as the API Gateway and single entry point for all frontend requests. Handles JWT token validation, CORS configuration, and routes requests to appropriate backend microservices.  
+**Repository**: [gateway-microservice-hms](https://github.com/vaibhavchaubey/gateway-microservice-hms)
 
-- `src/Service/AppointmentService.ts` (schedule/cancel/get appointments, reports, prescriptions)
-- `src/Service/MedicineService.ts`, `InventoryService.ts`, `UserService.ts`, etc.
+### 2. Eureka Server
 
-## 📌 Supported roles and capabilities
+Centralized service registry for microservice discovery. All backend services register themselves with Eureka, enabling dynamic service location and load balancing.  
+**Repository**: [eureka-server-hms](https://github.com/vaibhavchaubey/eureka-server-hms)
 
-- Admin: manage medicines, inventory, sales, users, and view analytics chart
-- Doctor: manage appointments, patients, prescriptions, profile
-- Patient: book appointments, view appointment history, manage profile
+### 3. User Microservice
 
-## 🛟 Where users can get help
+Handles user authentication, registration, login, and JWT token generation. Manages user accounts and role-based delegation to profile services.  
+**Repository**: [user-microservice-hms](https://github.com/vaibhavchaubey/user-microservice-hms)
 
-- Issues: [github.com/vaibhavchaubey/Hospital-Management-System-Frontend/issues](https://github.com/vaibhavchaubey/Hospital-Management-System-Frontend/issues)
-- Project README (this document)
+### 4. Profile Microservice
 
-## 🤝 Who maintains and contributes
+Manages doctor and patient profile data. Provides CRUD operations, profile validation, and dropdown/batch lookup endpoints for UI integration.  
+**Repository**: [profile-microservice-hms](https://github.com/vaibhavchaubey/profile-microservice-hms)
 
-Maintainer: **vaibhavchaubey**
+### 5. Appointment Microservice
 
-Contribution flow (basic):
+Handles appointment scheduling, cancellation, and querying. Provides analytics endpoints for appointment history, reason counts, and prescription management.  
+**Repository**: [appointment-microservice-hms](https://github.com/vaibhavchaubey/appointment-microservice-hms)
 
-1. Fork repository
-2. Create feature branch `feature/<name>`
-3. Commit and push
-4. Open PR against `main`
+### 6. Pharmacy Microservice
 
-> Note: No `CONTRIBUTING.md` in repository; add `CONTRIBUTING.md` to define formal guidelines.
+Manages medicine inventory, sales transactions, and pharmacy operations. Tracks medicine stock levels, categories, dosages, and sales records.  
+**Repository**: [pharmacy-microservice-hms](https://github.com/vaibhavchaubey/pharmacy-microservice-hms)
 
-## ✅ Recommended next steps for contributors
+### 7. Media Microservice
 
-- Add CI workflow and badge (`.github/workflows/...`)
-- Add tests (Jest/React Testing Library)
-- Add `CONTRIBUTING.md`, `CODE_OF_CONDUCT.md`, `LICENSE`
-- Add backend mock or integration documentation
+Handles file uploads and storage operations. Manages patient records, medical documentation, and profile pictures in a centralized media repository.  
+**Repository**: [media-microservice-hms](https://github.com/vaibhavchaubey/media-microservice-hms)
 
-## 📝 References
+---
 
-- `src/Routes/AppRoutes.tsx`
-- `src/Interceptor/AxiosInterceptor.tsx`
-- `src/Service`
-- `src/Slices````
+## 🔌 API Integration
+
+The frontend communicates with the backend services through the **API Gateway** at `VITE_API_URL`. All requests include:
+
+```
+Authorization: Bearer <JWT_TOKEN>
+```
+
+Exception: login and register endpoints bypass token validation.
+
+### Key API Endpoints (via Gateway)
+
+- `POST /user/login` - User authentication
+- `POST /user/register` - User registration
+- `GET /profile/{role}/{id}` - Get user profile
+- `POST /appointment/schedule` - Schedule appointment
+- `GET /appointment/getAllByPatient/{patientId}` - Fetch patient appointments
+- `GET /medicine/getAll` - List medicines
+- `POST /sale/create` - Record sale transaction
+- `POST /media/upload` - Upload files
+
+## 🧪 Testing
+
+```bash
+npm run test
+```
+
+## 📦 Build & Deployment
+
+### Production Build
+
+```bash
+npm run build
+```
+
+Build output is in `dist/` directory, ready for deployment to any static hosting service.
+
+### Environment Variables for Production
+
+Update `.env` or set environment variables:
+
+```env
+VITE_API_URL=https://your-api-gateway-url.com
+```
+
+### Deployment Options
+
+- **Vercel**: `npm run build` → Deploy `dist/` folder
+- **Netlify**: `npm run build` → Build output: `dist/`
+- **Docker**: Create a `Dockerfile` to containerize the React app with Node.js or Nginx
+- **GitHub Pages**: Configure build settings to deploy `dist/` folder
+- **AWS S3 + CloudFront**: Upload `dist/` to S3 bucket with CloudFront distribution
+
+## 🤝 Contributing
+
+1. Fork the repository
+2. Create a feature branch (`git checkout -b feature/your-feature`)
+3. Commit your changes (`git commit -m 'Add your feature'`)
+4. Run linter (`npm run lint`)
+5. Push to the branch (`git push origin feature/your-feature`)
+6. Open a Pull Request with a clear description and linked issue
+
+## 📝 License
+
+Add your open source / corporate license file at `/LICENSE` (e.g., Apache-2.0, MIT, etc.).
+
+---
+
+**Part of the Hospital Management System (HMS)** - A complete microservices-based healthcare management platform built with modern cloud-native technologies.
