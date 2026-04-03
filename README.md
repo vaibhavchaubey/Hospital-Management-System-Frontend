@@ -1,69 +1,158 @@
-# React + TypeScript + Vite
+# Hospital Management System Frontend
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+[![License](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
+[![npm version](https://img.shields.io/badge/v-0.0.0-brightgreen)](https://github.com/vaibhavchaubey/Hospital-Management-System-Frontend)
+[![Build Status](https://img.shields.io/badge/build-unknown-lightgrey)](#)
 
-Currently, two official plugins are available:
+> React + TypeScript + Vite frontend for a Hospital Management System, supporting Admin, Doctor, and Patient roles.
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+## 🚀 What the project does
 
-## Expanding the ESLint configuration
+A single-page application (SPA) with role-based dashboards and CRUD flows for hospital workflows:
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
+- Admin: Inventory, Medicines, Patients, Doctors, Sales, dashboard analytics
+- Doctor: Appointments, patient list, profile, pharmacy, appointment details
+- Patient: Book appointments, view profile, appointment history
+- Shared: JWT auth, protected routes, API integration via `axios`
 
-```js
-export default tseslint.config([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
+## 🌟 Why this project is useful
 
-      // Remove tseslint.configs.recommended and replace with this
-      ...tseslint.configs.recommendedTypeChecked,
-      // Alternatively, use this for stricter rules
-      ...tseslint.configs.strictTypeChecked,
-      // Optionally, add this for stylistic rules
-      ...tseslint.configs.stylisticTypeChecked,
+- Modular role-based UX for health operations
+- Responsive dashboard with charts and key metrics
+- Reusable service layer (`src/Service/*`) and centralized API interceptor (`src/Interceptor/AxiosInterceptor.tsx`)
+- Consistent UI with Mantine, PrimeReact, Tailwind
+- Redux Toolkit state management for JWT/profile data
 
-      // Other configs...
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+## 🧩 Tech stack
+
+- TypeScript + React 19
+- Vite 7
+- Mantine (UI), PrimeReact (tables), Recharts (charts)
+- React Router DOM 7 (lazy routes)
+- Redux Toolkit + React Redux
+- Axios with interceptors
+- Tailwind CSS
+
+## 📁 Project structure
+
+- `src/components`: UI components grouped by admin/doctor/patient modules
+- `src/pages`: page views and route endpoints
+- `src/Routes`: `AppRoutes`, `ProtectedRoute`, `PublicRoute`
+- `src/Service`: API service functions
+- `src/Interceptor`: global axios configuration
+- `src/Slices`: redux slices (`JwtSlice`, `ProfileSlice`, `UserSlice`)
+
+## 🛠️ Getting started
+
+### Prerequisites
+
+- Node.js 18+ / npm 10+
+- Backend API running and available via env variable `VITE_API_URL` (default: `http://localhost:9000`)
+
+### Install
+
+```bash
+npm install
 ```
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
+### Environment configuration
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
+Copy `.env.example` to `.env` and set the backend API URL:
 
-export default tseslint.config([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-      // Enable lint rules for React
-      reactX.configs['recommended-typescript'],
-      // Enable lint rules for React DOM
-      reactDom.configs.recommended,
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+```bash
+cp .env.example .env
 ```
+
+Example `.env`:
+
+```ini
+VITE_API_URL=http://localhost:9000
+```
+
+### Run locally
+
+```bash
+npm run dev
+```
+
+Open `http://localhost:5173` (or output URL).
+
+### Build for production
+
+```bash
+npm run build
+```
+
+Preview build output:
+
+```bash
+npm run preview
+```
+
+### Scripts
+
+- `npm run dev`: start dev server
+- `npm run build`: compile TypeScript + build static assets
+- `npm run preview`: local preview of production build
+- `npm run lint`: ESLint checks
+
+## 🔐 Authentication and routes
+
+- Public: `/`, `/register`, `/login`
+- Admin: `/admin/**` (dashboard, medicine, inventory, sales, patients, doctors)
+- Doctor: `/doctor/**` (dashboard, profile, pharmacy, patients, appointments)
+- Patient: `/patient/**` (dashboard, profile, appointments)
+- Fallback: `*` -> NotFound
+
+`ProtectedRoute` checks Redux `state.jwt`; redirects unauthenticated users to `/login`.
+
+## 🧩 API integration details
+
+Uses base URL from `src/Interceptor/AxiosInterceptor.tsx`:
+
+- `VITE_API_URL` environment variable
+- JWT injection into `Authorization` header
+- 401 intercept handles token expiry
+
+Service examples:
+
+- `src/Service/AppointmentService.ts` (schedule/cancel/get appointments, reports, prescriptions)
+- `src/Service/MedicineService.ts`, `InventoryService.ts`, `UserService.ts`, etc.
+
+## 📌 Supported roles and capabilities
+
+- Admin: manage medicines, inventory, sales, users, and view analytics chart
+- Doctor: manage appointments, patients, prescriptions, profile
+- Patient: book appointments, view appointment history, manage profile
+
+## 🛟 Where users can get help
+
+- Issues: [github.com/vaibhavchaubey/Hospital-Management-System-Frontend/issues](https://github.com/vaibhavchaubey/Hospital-Management-System-Frontend/issues)
+- Project README (this document)
+
+## 🤝 Who maintains and contributes
+
+Maintainer: **vaibhavchaubey**
+
+Contribution flow (basic):
+
+1. Fork repository
+2. Create feature branch `feature/<name>`
+3. Commit and push
+4. Open PR against `main`
+
+> Note: No `CONTRIBUTING.md` in repository; add `CONTRIBUTING.md` to define formal guidelines.
+
+## ✅ Recommended next steps for contributors
+
+- Add CI workflow and badge (`.github/workflows/...`)
+- Add tests (Jest/React Testing Library)
+- Add `CONTRIBUTING.md`, `CODE_OF_CONDUCT.md`, `LICENSE`
+- Add backend mock or integration documentation
+
+## 📝 References
+
+- `src/Routes/AppRoutes.tsx`
+- `src/Interceptor/AxiosInterceptor.tsx`
+- `src/Service`
+- `src/Slices````
